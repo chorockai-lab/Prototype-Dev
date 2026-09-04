@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment / API keys
+.env
+.env.*
+!.env.example
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Windows
+Thumbs.db
+
+# macOS
+.DS_Store
