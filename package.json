@@ -1,0 +1,28 @@
+{
+  "name": "gearmatch-mvp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "seed:build": "tsx scripts/seed/xlsx-to-json.ts",
+    "seed:verify": "tsx scripts/seed/verify-seed.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "exceljs": "^4.4.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  },
+  "private": true
+}

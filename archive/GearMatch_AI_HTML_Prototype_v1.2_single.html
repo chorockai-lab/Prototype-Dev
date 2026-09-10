@@ -1,0 +1,3364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- 브라우저 크롬도 주로 위에 선다. 지면 그라디언트의 최상단 값. -->
+  <meta name="theme-color" content="#A2381F" />
+  <meta name="color-scheme" content="dark" />
+  <title>GearMatch AI · 나는 어떤 러너일까?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- 한글 본문 — 기기별 산세리프 편차를 없앤다 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <!-- 라틴 디스플레이 — 주로에 칠하는 레인 번호의 폭 넓은 그로테스크 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&display=swap" />
+  <style>
+:root{
+  /* 주로 — 폴리우레탄 트랙 표면. 화면의 지면이다. */
+  --track:#A63D25;
+  --track-deep:#7C2C18;
+  --track-lit:#A2381F;
+  /* 레인 — 스텐실 페인트 */
+  --lane:#FFFFFF;
+  --lane-dim:rgba(255,255,255,.42);
+  --lane-ghost:rgba(255,255,255,.16);
+  /* 전광판 — 계측 장비가 놓이는 어두운 면 */
+  --board:#14171A;
+  --board-2:#1E2226;
+  --board-3:#2B3136;
+  --board-line:#3A4147;
+  /* 인필드 */
+  --infield:#0E4433;
+  /* 계측 신호 */
+  --signal:#F5B722;
+  --signal-deep:#C98D0C;
+  /* 밝은 면 — 차가운 오프화이트. 크림 아님. */
+  --paper:#EFF1EE;
+  --paper-2:#DCDFDB;
+  --paper-3:#C6CAC5;
+  --ink:#0E1113;
+  --ink-2:#3A4045;
+  --muted:#5E666C;
+
+  /* Core Type 레인 컬러 */
+  --t-rhythm:#2E7D5B;
+  --t-momentum:#C6521E;
+  --t-distance:#1F6FA8;
+  --t-pace:#B4362B;
+  --t-versatile:#6B5AA6;
+
+  --r-sm:2px;
+  --r-md:3px;
+
+  --lane-w:clamp(3px,1.1vw,5px);
+  --gutter:20px;
+
+  /* 서체 — 한글은 Pretendard, 라틴 디스플레이는 Archivo.
+     디스플레이는 라틴 전용이다. 한글에 폭 축을 걸면 자소가 뭉갠다. */
+  --font-sans:"Pretendard Variable","Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+  --font-display:"Archivo","Archivo Expanded",var(--font-sans);
+
+  --ease:cubic-bezier(.2,.72,.22,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+
+/* 라틴 계측 라벨 — 트래킹과 대문자화는 라틴에만 허용한다 */
+.lat{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  text-transform:uppercase;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:var(--track);color:var(--lane)}
+html{scroll-behavior:smooth}
+body{
+  display:flex;
+  justify-content:center;
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+/* 브라우저가 그리는 면도 이 월드에 속한다 */
+::selection{background:var(--signal);color:var(--board)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+input:focus-visible{outline-offset:1px}
+/* 전환 시 프로그램적으로 포커스를 받는 제목 — 조작 대상이 아니므로 링을 그리지 않는다 */
+[data-screen-heading]:focus{outline:none}
+/* 플레이스홀더도 읽혀야 한다 — lane-dim(.42)은 지면 위에서 2.3:1이었다 */
+::placeholder{color:rgba(255,255,255,.76);opacity:1}
+:root{scrollbar-color:var(--lane-dim) transparent;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--lane-dim);border:3px solid var(--track)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── 주로 ─────────────────────────────────────────────
+   레인 라인 두 줄이 화면 전 높이를 관통한다. 콘텐츠는 가운데 레인. */
+.app-shell{
+  width:min(100%,430px);
+  min-height:100dvh;
+  position:relative;
+  background:
+    linear-gradient(180deg,var(--track-lit) 0%,var(--track) 34%,var(--track-deep) 100%);
+  overflow:hidden;
+  overflow:clip;
+  isolation:isolate;
+}
+/* PU 고무 입자 텍스처 — 타일 하나로 끝낸다 */
+.app-shell:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.55;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cg fill='%23000' fill-opacity='.3'%3E%3Ccircle cx='4' cy='6' r='.9'/%3E%3Ccircle cx='17' cy='3' r='.7'/%3E%3Ccircle cx='24' cy='13' r='.9'/%3E%3Ccircle cx='11' cy='16' r='.8'/%3E%3Ccircle cx='2' cy='22' r='.7'/%3E%3Ccircle cx='20' cy='25' r='.9'/%3E%3C/g%3E%3Cg fill='%23fff' fill-opacity='.16'%3E%3Ccircle cx='9' cy='9' r='.7'/%3E%3Ccircle cx='22' cy='19' r='.6'/%3E%3Ccircle cx='14' cy='24' r='.7'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:28px 28px;
+}
+/* 레인 라인 */
+.app-shell:after{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;
+  left:0;right:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,transparent calc(var(--gutter) - var(--lane-w)),var(--lane) calc(var(--gutter) - var(--lane-w)),var(--lane) var(--gutter),transparent var(--gutter)),
+    linear-gradient(270deg,transparent calc(var(--gutter) - var(--lane-w)),var(--lane) calc(var(--gutter) - var(--lane-w)),var(--lane) var(--gutter),transparent var(--gutter));
+  opacity:.9;
+}
+
+.screen{
+  position:relative;
+  z-index:2;
+  min-height:100dvh;
+  padding:16px calc(var(--gutter) + 14px) calc(34px + env(safe-area-inset-bottom));
+  display:flex;
+  flex-direction:column;
+  animation:laneIn .34s var(--ease-out) both;
+}
+@keyframes laneIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:none}
+}
+
+/* ── 상단 바 ───────────────────────────────────────── */
+.topbar{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:10px;
+  min-height:34px;
+  margin-bottom:18px;
+}
+.topbar>:last-child{justify-self:end}
+.brand{
+  justify-self:center;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+  color:var(--lane);
+  white-space:nowrap;
+}
+.brand svg{flex:0 0 auto;width:15px;height:15px}
+.back{
+  justify-self:start;
+  border:0;
+  background:transparent;
+  color:var(--lane);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.02em;
+  padding:7px 9px 7px 0;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  opacity:.86;
+}
+.back:hover{opacity:1}
+
+/* ── 타이포 ───────────────────────────────────────── */
+h1,h2,h3,p{margin-top:0}
+h1{
+  font-size:clamp(38px,10.8vw,46px);
+  line-height:1.02;
+  letter-spacing:-.035em;
+  font-weight:800;
+  margin-bottom:14px;
+  color:var(--lane);
+}
+h2{
+  font-size:clamp(26px,7.4vw,31px);
+  line-height:1.16;
+  letter-spacing:-.028em;
+  font-weight:800;
+  margin-top:10px;
+  margin-bottom:12px;
+  color:var(--lane);
+  text-wrap:balance;
+}
+h3{
+  font-size:19px;
+  line-height:1.3;
+  letter-spacing:-.02em;
+  font-weight:750;
+  margin-bottom:9px;
+}
+.body{
+  font-size:15px;
+  line-height:1.66;
+  color:rgba(255,255,255,.94);
+  max-width:34ch;
+}
+.body strong{color:var(--lane);font-weight:750}
+.small{font-size:12px;line-height:1.6;color:rgba(255,255,255,.84)}
+
+/* 계측 라벨 — 전광판의 글자.
+   라틴만 대문자·트래킹을 받는다. 한글에 트래킹을 걸면 자간이 벌어져
+   오타처럼 읽히므로, 한글 라벨은 크기와 굵기로만 위계를 만든다. */
+.micro,.progress-count,.line-label,.preview-kicker,.product-brand{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1;
+}
+.metric-label,.reason-label,.overview-role,.direction-word,.field-title{
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1;
+}
+.micro{
+  font-size:9.5px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+/* 한글 라벨 — 트래킹 없음. 앰버는 전광판 위에서만 텍스트로 쓴다. */
+.label-ko,.reason-label,.shift-label{
+  font-size:11.5px;
+  font-weight:800;
+  letter-spacing:-.008em;
+  color:var(--signal);
+}
+.stack{display:grid;gap:0}
+.section-gap{margin-top:22px}
+.actions{margin-top:auto;padding-top:24px;display:grid;gap:10px}
+.action-note{
+  margin:0;
+  text-align:center;
+  font-size:12px;
+  line-height:1.6;
+  color:rgba(255,255,255,.86);
+}
+
+/* ── 거리 마커 = 진행 표시 ─────────────────────────── */
+.progress-row{
+  display:grid;
+  gap:9px;
+  margin-bottom:24px;
+}
+/* 단계 이름을 붙인다 — 여정 안에서 지금 어느 구간인지 알 수 있어야 한다 */
+.progress-meta{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+}
+.progress-phase{
+  font-size:12.5px;
+  font-weight:750;
+  letter-spacing:-.01em;
+  color:rgba(255,255,255,.92);
+}
+.track-progress{
+  display:grid;
+  gap:5px;
+  height:12px;
+  align-items:start;
+}
+.track-progress>*{height:12px}
+.track-stop{
+  background:var(--lane-ghost);
+  border-radius:1px;
+  transition:background .3s var(--ease),box-shadow .3s var(--ease);
+}
+.track-stop.done{background:var(--lane-dim)}
+/* 현재 구간은 칠해진 마커다. 빛나지 않는다. */
+.track-stop.current{
+  background:var(--signal);
+  height:18px;
+  margin-top:-3px;
+}
+.progress-count{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.1em;
+  color:rgba(255,255,255,.86);
+}
+
+/* ── 선택지 = 레인에 찍힌 구간 ─────────────────────── */
+.option{
+  position:relative;
+  width:100%;
+  text-align:left;
+  border:0;
+  background:rgba(255,255,255,.07);
+  color:var(--lane);
+  font-size:15.5px;
+  font-weight:600;
+  line-height:1.42;
+  letter-spacing:-.012em;
+  padding:17px 46px 17px 16px;
+  min-height:60px;
+  border-top:1px solid var(--lane-ghost);
+  transition:background .2s var(--ease),padding-left .2s var(--ease);
+}
+.stack .option:last-child{border-bottom:1px solid var(--lane-ghost)}
+.option:after{
+  content:"";
+  position:absolute;
+  right:16px;
+  top:50%;
+  width:15px;height:15px;
+  margin-top:-7.5px;
+  border:2px solid var(--lane-dim);
+  border-radius:50%;
+  transition:border-color .2s var(--ease),background .2s var(--ease),box-shadow .2s var(--ease);
+}
+.option.selected{
+  background:var(--lane);
+  color:var(--board);
+  font-weight:750;
+  padding-left:22px;
+}
+.option.selected:after{
+  border-color:var(--track);
+  background:var(--track);
+  box-shadow:0 0 0 3px rgba(166,61,37,.2);
+}
+/* 선택 확정 — 백색 페인트가 왼쪽에서 칠해진다. 넘어가기 전 한 박자. */
+.option.selected{animation:paintIn .26s var(--ease-out) both}
+@keyframes paintIn{
+  from{clip-path:inset(0 100% 0 0)}
+  to{clip-path:inset(0 0 0 0)}
+}
+
+.question-body{margin:auto 0;padding-bottom:8px}
+.flow-hint{
+  margin:18px 0 0;
+  font-size:12.5px;
+  line-height:1.6;
+  color:rgba(255,255,255,.84);
+}
+.flow-hint strong{color:var(--lane);font-weight:750}
+
+.sr-only{
+  position:absolute;
+  width:1px;height:1px;
+  margin:-1px;padding:0;border:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  white-space:nowrap;
+}
+
+/* ── 레인 배정 리빌 ────────────────────────────────── */
+.reveal-screen{justify-content:center}
+.reveal-stage{position:relative;padding:34px 0}
+/* 스타트 라인이 화면을 가로지르고 그 뒤로 이름이 칠해진다 */
+.reveal-sweep{
+  position:absolute;
+  left:calc(-1 * (var(--gutter) + 14px));
+  right:calc(-1 * (var(--gutter) + 14px));
+  top:0;
+  height:9px;
+  background:var(--lane);
+  transform-origin:left center;
+  animation:sweepAcross .5s var(--ease-out) both;
+}
+@keyframes sweepAcross{
+  from{transform:scaleX(0)}
+  to{transform:scaleX(1)}
+}
+.reveal-label{
+  margin-top:26px;
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.88);
+  animation:laneIn .3s var(--ease-out) .22s both;
+}
+.reveal-type{
+  margin-top:12px;
+  font-family:var(--font-display);
+  font-stretch:106%;
+  font-size:var(--type-size,50px);
+  line-height:.92;
+  font-weight:900;
+  letter-spacing:-.045em;
+  text-transform:uppercase;
+  color:var(--lane);
+  animation:paintIn .58s var(--ease-out) .3s both;
+}
+.reveal-marks{display:flex;gap:6px;margin-top:24px}
+.reveal-marks span{
+  flex:1;
+  height:12px;
+  background:var(--lane-ghost);
+  border-radius:1px;
+  animation:markFill .3s var(--ease-out) both;
+}
+@keyframes markFill{
+  from{background:var(--lane-ghost)}
+  to{background:var(--signal)}
+}
+
+/* ── 버튼 ─────────────────────────────────────────── */
+.btn{
+  width:100%;
+  border:0;
+  min-height:56px;
+  border-radius:var(--r-sm);
+  padding:15px 18px;
+  background:var(--board);
+  color:var(--lane);
+  font-size:16px;
+  font-weight:800;
+  letter-spacing:-.012em;
+  box-shadow:0 6px 20px rgba(0,0,0,.3);
+  transition:transform .16s var(--ease),background .18s var(--ease),box-shadow .18s var(--ease);
+}
+.btn:hover:not(:disabled){background:var(--board-2);box-shadow:0 9px 26px rgba(0,0,0,.36)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{
+  background:rgba(20,23,26,.34);
+  color:rgba(255,255,255,.44);
+  box-shadow:none;
+  cursor:not-allowed;
+}
+.btn.block-cta{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+.block-mark{flex:0 0 auto;display:block;width:34px;height:19px;color:var(--signal)}
+.block-mark svg{width:100%;height:100%;display:block}
+.btn.secondary{
+  background:transparent;
+  color:var(--lane);
+  border:2px solid var(--lane-dim);
+  box-shadow:none;
+}
+.btn.secondary:hover{border-color:var(--lane);background:rgba(255,255,255,.08)}
+
+/* ── 랜딩 = 스타팅 라인 ────────────────────────────── */
+.landing-copy{margin-bottom:6px}
+/* 한글은 스텐실 브리지를 쓸 수 없다(자소가 끊긴다). 대신 헤드라인을
+   주로에 칠한 마킹처럼 다룬다 — 아래로 굵은 페인트 스트로크. */
+.landing-copy h1{
+  position:relative;
+  display:inline-block;
+  padding-bottom:12px;
+}
+.landing-copy h1:after{
+  content:"";
+  position:absolute;
+  left:0;bottom:0;
+  width:min(100%,182px);
+  height:7px;
+  background:var(--lane);
+  clip-path:polygon(0 0,100% 0,calc(100% - 7px) 100%,0 100%);
+}
+.hero-stage{
+  position:relative;
+  margin:18px calc(-1 * (var(--gutter) + 14px)) 18px;
+  padding:0 calc(var(--gutter) + 14px);
+  min-height:296px;
+  display:flex;
+  align-items:flex-start;
+}
+/* 스타트 라인 — 굵은 흰 띠 */
+.hero-stage:before{
+  content:"";
+  position:absolute;
+  left:0;right:0;
+  top:0;
+  height:9px;
+  background:var(--lane);
+  box-shadow:0 3px 12px rgba(0,0,0,.3);
+}
+.campaign-word{
+  position:absolute;
+  left:calc(var(--gutter) + 14px);
+  top:26px;
+  width:86px;
+  height:200px;
+  color:var(--lane-ghost);
+  pointer-events:none;
+}
+.hero-caption{
+  position:absolute;
+  left:calc(var(--gutter) + 14px);
+  bottom:6px;
+  z-index:4;
+  display:grid;
+  gap:7px;
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--lane);
+}
+.hero-caption span{
+  display:block;
+  padding-left:15px;
+  position:relative;
+  text-shadow:0 1px 6px rgba(0,0,0,.4);
+}
+.hero-caption span:before{
+  content:"";
+  position:absolute;
+  left:0;top:4px;
+  width:8px;height:3px;
+  background:var(--signal);
+}
+
+/* 레인 배정 카드 (랜딩 프리뷰) */
+.preview-card{
+  --card-accent:var(--t-pace);
+  position:absolute;
+  right:calc(var(--gutter) + 6px);
+  top:34px;
+  width:min(230px,58vw);
+  padding:16px 16px 14px;
+  background:var(--board);
+  color:var(--lane);
+  border-radius:var(--r-md);
+  box-shadow:0 20px 44px rgba(0,0,0,.42);
+  transform:rotate(-2.4deg);
+  z-index:3;
+  overflow:hidden;
+}
+.preview-card:before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:4px;
+  background:var(--card-accent);
+}
+.preview-kicker{
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--signal);
+}
+.preview-title{
+  font-family:var(--font-display);
+  font-stretch:106%;
+  margin-top:10px;
+  color:var(--lane);
+  font-size:var(--type-size,27px);
+  line-height:.94;
+  font-weight:900;
+  letter-spacing:-.042em;
+  text-transform:uppercase;
+}
+.preview-card .runner-line{
+  position:absolute;
+  right:10px;bottom:52px;
+  width:74px;height:88px;
+  color:var(--lane);
+  opacity:.16;
+}
+.preview-card .shoe-mark{
+  position:absolute;
+  left:8px;bottom:34px;
+  width:150px;height:64px;
+  color:var(--card-accent);
+  opacity:.9;
+}
+.preview-metric{
+  margin-top:64px;
+  padding-top:9px;
+  border-top:1px solid var(--board-line);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.11em;
+  color:rgba(255,255,255,.58);
+}
+
+.landing-cta{display:grid;gap:12px;margin-top:auto;padding-top:8px}
+.returning-entry{
+  border:0;
+  background:transparent;
+  color:var(--lane);
+  font-size:13.5px;
+  font-weight:650;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+}
+.returning-entry span{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.14em;
+  color:rgba(255,255,255,.88);
+}
+.landing-meta{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.05em;
+  color:rgba(255,255,255,.86);
+}
+.dev-note{
+  font-size:10px;
+  line-height:1.5;
+  text-align:center;
+  color:rgba(255,255,255,.82);
+}
+
+/* ── 폼 ───────────────────────────────────────────── */
+.form-section{
+  display:grid;
+  /* 46px 거리 입력의 min-content가 컬럼을 밀어내 레인 라인을 넘던 것을 막는다 */
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
+  margin-top:20px;
+}
+/* 프로필과 RUN 입력의 항목명은 라벨이 아니라 질문이다.
+   5문항과 같은 목소리로 묻는다. */
+.field-title{
+  font-size:19px;
+  font-weight:750;
+  line-height:1.34;
+  letter-spacing:-.02em;
+  color:var(--lane);
+  margin:28px 0 13px;
+}
+.form-section>.field-title:first-child{margin-top:0}
+.compact-grid{display:flex;flex-wrap:wrap;gap:7px}
+.compact-option{
+  border:2px solid var(--lane-dim);
+  background:transparent;
+  color:var(--lane);
+  border-radius:100px;
+  padding:11px 15px;
+  min-height:44px;
+  font-size:13.5px;
+  font-weight:700;
+  transition:background .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease);
+}
+.compact-option:hover{border-color:var(--lane)}
+.compact-option.selected{
+  background:var(--lane);
+  border-color:var(--lane);
+  color:var(--board);
+}
+.line-field{display:grid;gap:7px;margin-bottom:18px}
+/* 지면 위 라벨은 백색 페인트다. 앰버는 전광판 위에서만 글자가 된다. */
+.line-label{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.9);
+}
+.line-field input{
+  width:100%;
+  border:0;
+  border-bottom:2px solid var(--lane-dim);
+  background:transparent;
+  color:var(--lane);
+  font-size:19px;
+  font-weight:700;
+  padding:10px 0;
+  min-height:48px;
+}
+.line-field input:focus{border-bottom-color:var(--signal);outline:none}
+.line-field.pin input{letter-spacing:.5em;font-variant-numeric:tabular-nums}
+.login-hint{font-size:11.5px;line-height:1.6;color:rgba(255,255,255,.86)}
+.returning-intro{margin-bottom:26px}
+.returning-form{display:grid}
+
+.searchbox{margin-top:22px;position:relative;display:grid;gap:7px}
+.searchbox input{
+  width:100%;
+  border:0;
+  border-bottom:2px solid var(--lane-dim);
+  background:transparent;
+  color:var(--lane);
+  font-size:16px;
+  font-weight:650;
+  padding:12px 0;
+  min-height:48px;
+}
+.searchbox input:focus{border-bottom-color:var(--signal);outline:none}
+
+.shoe-list{margin-top:14px}
+/* 제품 이미지가 아직 없다. 같은 회색 실루엣 다섯 개를 반복하는 대신
+   행을 텍스트로 둔다 — 없는 것을 있는 척하지 않는다. */
+.shoe-row{
+  position:relative;
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 18px;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  border:0;
+  border-bottom:1px solid var(--lane-ghost);
+  background:transparent;
+  color:var(--lane);
+  padding:13px 2px;
+  min-height:58px;
+  font-size:15px;
+  font-weight:650;
+  transition:background .18s var(--ease),padding-left .18s var(--ease)}
+.shoe-row:hover{background:rgba(255,255,255,.07)}
+.shoe-row.selected{background:var(--lane);color:var(--board);font-weight:750;padding-left:12px}
+.shoe-row.custom{
+  margin-top:10px;
+  border:2px dashed var(--lane-dim);
+  border-radius:var(--r-sm);
+  padding:13px 14px;
+}
+.shoe-row.custom small{
+  display:block;
+  margin-top:3px;
+  font-size:11.5px;
+  font-weight:600;
+  color:rgba(255,255,255,.82);
+}
+.shoe-row.custom.selected small{color:rgba(20,23,26,.72)}
+.shoe-row.custom strong{font-size:15px;font-weight:800}
+.shoe-empty{
+  margin-top:14px;
+  font-size:12.5px;
+  line-height:1.6;
+  color:rgba(255,255,255,.86);
+}
+.shoe-fallbacks{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
+.chip-row{
+  border:2px solid var(--lane-dim);
+  background:transparent;
+  color:var(--lane);
+  border-radius:100px;
+  padding:11px 15px;
+  min-height:44px;
+  font-size:13.5px;
+  font-weight:700;
+  transition:background .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease);
+}
+.chip-row:hover{border-color:var(--lane)}
+.chip-row.selected{background:var(--lane);border-color:var(--lane);color:var(--board)}
+.shoe-dot{
+  width:15px;height:15px;
+  border:2px solid var(--lane-dim);
+  border-radius:50%;
+}
+.shoe-row.selected .shoe-dot{border-color:var(--track);background:var(--track)}
+
+/* ── Runner Card = 레인 배정 카드 ──────────────────── */
+.result-wrap{padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+.runner-card{
+  --card-accent:var(--t-versatile);
+  position:relative;
+  margin-top:14px;
+  padding:20px 20px 0;
+  background:var(--board);
+  border-radius:var(--r-md);
+  overflow:hidden;
+  box-shadow:0 22px 50px rgba(0,0,0,.42);
+}
+.runner-card[data-type="RHYTHM_MAKER"]{--card-accent:var(--t-rhythm)}
+.runner-card[data-type="MOMENTUM_BUILDER"]{--card-accent:var(--t-momentum)}
+.runner-card[data-type="DISTANCE_ARCHITECT"]{--card-accent:var(--t-distance)}
+.runner-card[data-type="PACE_TACTICIAN"]{--card-accent:var(--t-pace)}
+.runner-card[data-type="VERSATILE_EXPLORER"]{--card-accent:var(--t-versatile)}
+/* 배정 레인 표시 */
+.runner-card:before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:5px;
+  background:var(--card-accent);
+}
+/* 디스플레이 보이스 — 폰트가 아니라 스텐실 컷.
+   트랙 마킹은 브리지가 있는 스텐실로 칠해진다. 그 브리지를 마스크로 낸다.
+   큰 글자에만 쓴다. 본문에는 절대 쓰지 않는다. */
+.stencil{
+  /* 브리지 하나. 라틴 대문자 전용 — 한글에 쓰면 자소를 잘라먹는다. */
+  -webkit-mask-image:repeating-linear-gradient(180deg,
+    #000 0, #000 .54em,
+    transparent .54em, transparent .60em,
+    #000 .60em, #000 1em);
+  mask-image:repeating-linear-gradient(180deg,
+    #000 0, #000 .54em,
+    transparent .54em, transparent .60em,
+    #000 .60em, #000 1em);
+}
+.runner-type{
+  position:relative;
+  z-index:3;
+  font-family:var(--font-display);
+  font-stretch:106%;
+  margin-top:12px;
+  color:var(--lane);
+  font-size:var(--type-size,50px);
+  line-height:.92;
+  font-weight:900;
+  letter-spacing:-.045em;
+  text-transform:uppercase;
+  word-break:keep-all;
+  overflow-wrap:normal;
+}
+.modifier-chip{
+  display:inline-block;
+  margin-top:13px;
+  padding:6px 11px;
+  border:2px solid var(--card-accent);
+  border-radius:100px;
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.06em;
+  color:var(--lane);
+  background:color-mix(in srgb,var(--card-accent) 22%,transparent);
+}
+.runner-copy{
+  margin-top:13px;
+  font-size:13.5px;
+  line-height:1.55;
+  font-weight:600;
+  color:rgba(255,255,255,.8);
+  max-width:30ch;
+}
+.runner-editorial{
+  position:relative;
+  height:158px;
+  margin:10px -20px 0;
+}
+.runner-editorial .runner-line{
+  position:absolute;
+  right:4px;top:-16px;
+  width:96px;height:120px;
+  color:var(--lane);
+  opacity:.15;
+}
+.runner-editorial .shoe-mark{
+  position:absolute;
+  left:10px;bottom:6px;
+  width:236px;height:104px;
+  color:var(--card-accent);
+}
+.focus-line{
+  display:flex;
+  gap:9px;
+  align-items:flex-start;
+  margin:0 0 14px;
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:-.006em;
+  color:rgba(255,255,255,.72);
+}
+.focus-line:before{
+  content:"";
+  flex:0 0 auto;
+  width:26px;height:3px;
+  margin-top:4px;
+  background:var(--card-accent);
+}
+.metric-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:0 16px;
+  margin:0 -20px;
+  padding:0 20px 18px;
+}
+.metric{
+  padding:13px 0 0;
+  border-top:1px solid var(--board-line);
+  min-width:0;
+}
+.metric-label{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:-.005em;
+  color:rgba(255,255,255,.66);
+  margin-bottom:6px;
+}
+/* 계측값 — 절대 단어 중간에서 끊지 않는다 */
+.metric-value{
+  font-size:clamp(16px,4.6vw,20px);
+  line-height:1.14;
+  font-weight:800;
+  letter-spacing:-.028em;
+  color:var(--lane);
+  word-break:keep-all;
+  overflow-wrap:normal;
+  hyphens:none;
+  font-variant-numeric:tabular-nums;
+}
+/* 제품명은 단어 사이에서 접힌다 */
+.metric:nth-child(4) .metric-value{font-size:16px;overflow-wrap:break-word}
+.metric-sub{
+  display:block;
+  margin-top:6px;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.07em;
+  color:rgba(255,255,255,.55);
+}
+.metric-value.filled{animation:markPaint .42s var(--ease-out) both}
+.metric:nth-child(1) .metric-value.filled{animation-delay:.06s}
+.metric:nth-child(2) .metric-value.filled{animation-delay:.12s}
+.metric:nth-child(3) .metric-value.filled{animation-delay:.18s}
+.metric:nth-child(4) .metric-value.filled{animation-delay:.24s}
+@keyframes markPaint{
+  from{opacity:0;clip-path:inset(0 100% 0 0)}
+  to{opacity:1;clip-path:inset(0 0 0 0)}
+}
+.card-status{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 -20px;
+  padding:11px 20px;
+  border-top:1px solid var(--board-line);
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:-.004em;
+  color:rgba(255,255,255,.6);
+}
+.card-status span:first-child{color:var(--signal)}
+.card-mark{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  letter-spacing:.13em;
+  color:rgba(255,255,255,.5);
+}
+.card-mark span{color:rgba(255,255,255,.32)}
+.runner-card-bottom{
+  height:6px;
+  margin:0 -20px;
+  background:var(--card-accent);
+}
+
+/* 소유 행동은 설명 다음에 온다.
+   이전 빌드는 라벨이 버튼 아래에 있어 순서가 뒤집혀 있었다. */
+.card-ownership{margin-top:24px}
+.ownership-line{
+  margin:0 0 10px;
+  font-size:13px;
+  line-height:1.6;
+  color:rgba(255,255,255,.88);
+  max-width:34ch;
+}
+.card-ownership-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.card-tool-btn{
+  min-height:48px;
+  border:2px solid var(--lane-dim);
+  border-radius:var(--r-sm);
+  background:transparent;
+  color:var(--lane);
+  font-size:14px;
+  font-weight:750;
+  transition:border-color .18s var(--ease),background .18s var(--ease);
+}
+.card-tool-btn:hover{border-color:var(--lane);background:rgba(255,255,255,.08)}
+
+.identity-caption{
+  margin:10px 0 0;
+  font-size:14px;
+  line-height:1.62;
+  color:rgba(255,255,255,.94);
+  max-width:36ch;
+}
+.identity-caption.dim{
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--lane-ghost);
+  font-size:13px;
+  color:rgba(255,255,255,.88);
+}
+.identity-caption strong{color:var(--lane);font-weight:750}
+.type-evidence{
+  margin-top:12px;
+  font-size:13px;
+  line-height:1.6;
+  color:rgba(255,255,255,.9);
+}
+.type-evidence strong{color:var(--lane);font-weight:800}
+.type-shift{
+  margin-top:14px;
+  padding:14px 16px;
+  background:var(--board);
+  border-radius:var(--r-sm);
+  display:grid;
+  gap:6px;
+}
+.type-shift strong{font-size:14.5px;line-height:1.5;font-weight:750}
+.type-shift span{font-size:12px;line-height:1.55;color:rgba(255,255,255,.72)}
+
+/* ── 다음 구간 ─────────────────────────────────────
+   장비 추천이 주행동이다. RUN 추가는 카드를 키우는 보조 루프로 내린다
+   (PRODUCT.md — 성공은 장비 선택까지 이어가는 것, 기록 앱이 아니다). */
+.card-loop{
+  margin-top:28px;
+  padding-top:22px;
+  border-top:2px solid var(--lane-ghost);
+}
+.loop-title{
+  margin:0;
+  font-size:21px;
+  line-height:1.24;
+  font-weight:800;
+  letter-spacing:-.024em;
+  color:var(--lane);
+  max-width:20ch;
+}
+.loop-copy{
+  margin:9px 0 0;
+  font-size:13.5px;
+  line-height:1.62;
+  color:rgba(255,255,255,.88);
+  max-width:34ch;
+}
+.run-update{
+  margin-top:14px;
+  padding:12px 14px;
+  background:rgba(255,255,255,.1);
+  border-radius:var(--r-sm);
+  display:grid;
+  gap:5px;
+}
+.run-update .micro{color:rgba(255,255,255,.88)}
+.run-update strong{font-size:13.5px;font-weight:750;font-variant-numeric:tabular-nums}
+.loop-btn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  text-align:left;
+  border:2px solid var(--lane-dim);
+  border-radius:var(--r-sm);
+  background:transparent;
+  color:var(--lane);
+  padding:14px 15px;
+  min-height:66px;
+  font-size:15px;
+  font-weight:750;
+  transition:border-color .18s var(--ease),background .18s var(--ease);
+}
+.loop-btn:hover{border-color:var(--lane);background:rgba(255,255,255,.07)}
+.loop-btn strong{display:block;font-size:15px;font-weight:800}
+.loop-btn small{display:block;margin-top:4px;font-size:11.5px;line-height:1.45;font-weight:600;color:rgba(255,255,255,.84)}
+.loop-btn .plus{
+  flex:0 0 auto;
+  width:32px;height:32px;
+  display:grid;place-items:center;
+  border:2px solid var(--lane-dim);
+  color:var(--lane);
+}
+.loop-btn .plus svg{width:16px;height:16px}
+.loop-btn:hover .plus{border-color:var(--lane)}
+.loop-btn small{display:block;margin-top:4px;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.66)}
+
+/* ── RUN 추가 ─────────────────────────────────────── */
+.run-entry-wrap .run-entry-hero{margin-bottom:6px}
+.run-entry-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:2px solid var(--lane-ghost);
+}
+.run-entry-stat span{
+  display:block;
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-size:9.5px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.88);
+  margin-bottom:6px;
+}
+.run-entry-stat strong{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-.028em;
+  font-variant-numeric:tabular-nums;
+  word-break:keep-all;
+}
+.distance-field{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  border-bottom:2px solid var(--lane-dim);
+  padding-bottom:6px;
+}
+.distance-field:focus-within{border-bottom-color:var(--signal)}
+.distance-field input{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  flex:1;
+  min-width:0;
+  border:0;
+  background:transparent;
+  color:var(--lane);
+  font-size:46px;
+  font-weight:800;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+  padding:6px 0;
+}
+.distance-field input:focus{outline:none}
+.distance-field input::-webkit-outer-spin-button,
+.distance-field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.distance-field input[type=number]{-moz-appearance:textfield}
+.distance-unit{
+  flex:0 0 auto;
+  font-family:var(--font-display);
+  font-stretch:112%;
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.88);
+}
+.run-shoe-list{display:grid;gap:9px;margin-top:6px}
+.run-shoe-option{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 18px;
+  align-items:center;
+  gap:13px;
+  text-align:left;
+  border:2px solid var(--lane-ghost);
+  border-radius:var(--r-sm);
+  background:transparent;
+  color:var(--lane);
+  padding:13px 14px;
+  min-height:70px;
+  transition:border-color .18s var(--ease),background .18s var(--ease);
+}
+.run-shoe-option:hover{border-color:var(--lane-dim)}
+.run-shoe-option.selected{border-color:var(--lane);background:rgba(255,255,255,.1)}
+.run-shoe-copy strong{display:block;font-size:14.5px;font-weight:750}
+.run-shoe-copy small{display:block;margin-top:4px;font-size:11px;line-height:1.45;color:rgba(255,255,255,.66)}
+.run-shoe-option.selected .shoe-dot{border-color:var(--signal);background:var(--signal)}
+.run-entry-note{
+  margin-top:14px;
+  font-size:11.5px;
+  line-height:1.6;
+  color:rgba(255,255,255,.86);
+}
+
+/* ── Gear 진입 ────────────────────────────────────── */
+.gear-entry{
+  margin-top:24px;
+  padding:16px;
+  background:rgba(0,0,0,.16);
+  border-radius:var(--r-sm);
+}
+.gear-entry-title{font-size:14.5px;font-weight:800;margin-bottom:6px}
+.askbox{
+  display:flex;
+  gap:9px;
+  margin-top:12px;
+}
+.askbox input{
+  flex:1;
+  min-width:0;
+  border:0;
+  border-bottom:2px solid var(--lane-dim);
+  background:transparent;
+  color:var(--lane);
+  font-size:14.5px;
+  padding:11px 0;
+  min-height:46px;
+}
+.askbox input:focus{border-bottom-color:var(--signal);outline:none}
+/* 앰버는 면을 채우지 않는다(One Signal Rule). 보내기는 전광판 면이다. */
+.ask-send{
+  flex:0 0 auto;
+  border:0;
+  border-radius:var(--r-sm);
+  background:var(--board);
+  color:var(--lane);
+  font-size:13.5px;
+  font-weight:800;
+  padding:0 16px;
+  min-height:46px;
+  transition:background .18s var(--ease);
+}
+.ask-send:hover{background:var(--board-3)}
+.prompt-examples{margin-top:10px;font-size:11.5px;line-height:1.55;color:rgba(255,255,255,.84)}
+
+/* ── 추천 = 레인이 갈라진다 ────────────────────────── */
+.recommendation-context{
+  margin-top:20px;
+  padding:16px;
+  background:var(--board);
+  border-radius:var(--r-md);
+}
+.context-foot{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:6px 14px;
+  margin-top:14px;
+  padding-top:13px;
+  border-top:1px solid var(--board-line);
+}
+.context-note{
+  flex:1 1 190px;
+  font-size:11.5px;
+  line-height:1.55;
+  color:rgba(255,255,255,.66);
+}
+.context-edit{
+  border:0;
+  background:transparent;
+  color:var(--signal);
+  font-size:12px;
+  font-weight:750;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  text-decoration-thickness:1.5px;
+  min-height:44px;
+  padding:0;
+}
+.context-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+.context-chip{
+  border:1px solid var(--board-line);
+  border-radius:100px;
+  padding:6px 11px;
+  font-size:11.5px;
+  font-weight:700;
+  color:rgba(255,255,255,.86);
+}
+/* 사람이 읽는 문장이 먼저, 기계가 읽는 칩이 뒤 */
+.context-summary{
+  margin:0;
+  font-size:14px;
+  line-height:1.62;
+  font-weight:650;
+  color:rgba(255,255,255,.94);
+}
+
+.gear-overview{margin-top:28px}
+.overview-title{
+  margin:0;
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-.026em;
+  color:var(--lane);
+}
+.overview-note{
+  margin:7px 0 14px;
+  font-size:13px;
+  line-height:1.55;
+  color:rgba(255,255,255,.88);
+}
+/* 세 레인을 한 화면에 나란히 — 겹쳐 대조 */
+.overview-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  border-top:4px solid var(--lane);
+  background:var(--board);
+  border-radius:0 0 var(--r-md) var(--r-md);
+  overflow:hidden;
+}
+.overview-item{
+  padding:14px 10px 16px;
+  border-right:1px solid var(--board-line);
+  display:grid;
+  gap:8px;
+  align-content:start;
+  min-width:0;
+}
+.overview-item:last-child{border-right:0}
+.overview-role{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:-.008em;
+  color:var(--signal);
+  line-height:1.35;
+}
+/* 375px 3열에서 제품명이 부서지던 자리. 방향이 주인공이고
+   제품명은 아래 카드로 이어주는 실마리라 한 단 낮춘다. */
+.overview-product{
+  font-family:var(--font-display);
+  font-stretch:108%;
+  font-size:11.5px;
+  line-height:1.34;
+  font-weight:700;
+  color:rgba(255,255,255,.74);
+  overflow-wrap:break-word;
+  hyphens:none;
+}
+
+.direction-list{display:grid;gap:16px;margin-top:24px}
+.choice-card{
+  position:relative;
+  padding:18px 18px 18px;
+  background:var(--board);
+  border-radius:var(--r-md);
+  overflow:hidden;
+  box-shadow:0 14px 34px rgba(0,0,0,.3);
+}
+/* 각 후보는 자기 레인을 갖는다 — 등수가 아니라 배정 */
+.choice-card:before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:5px;
+  background:var(--lane-dim);
+}
+.choice-card:nth-child(1):before{background:var(--t-distance)}
+.choice-card:nth-child(2):before{background:var(--t-rhythm)}
+.choice-card:nth-child(3):before{background:var(--t-momentum)}
+/* 한글 라벨 — 트래킹 없이 크기·굵기·색으로만 위계를 만든다 */
+.direction-word{
+  font-size:12.5px;
+  font-weight:800;
+  letter-spacing:-.008em;
+  color:var(--signal);
+  margin-bottom:12px;
+}
+.product-brand{
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.62);
+}
+.product-name{
+  font-family:var(--font-display);
+  font-stretch:112%;
+  margin:5px 0 0;
+  font-size:22px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:-.026em;
+  color:var(--lane);
+}
+.product-visual{
+  margin:14px 0 0;
+  padding:14px;
+  background:var(--board-2);
+  border-radius:var(--r-sm);
+}
+.product-media{
+  height:112px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+}
+.product-media img{max-width:100%;max-height:100%;object-fit:contain}
+.product-micro{
+  margin-top:7px;
+  color:rgba(255,255,255,.6);
+}
+
+.primary-reasons{display:grid;gap:14px;margin-top:16px}
+/* D-06 — WARN 등급 확인 사항은 접힌 영역에 두지 않는다 */
+.reason-block.watch{
+  padding:12px 14px;
+  background:var(--board-2);
+  border-radius:var(--r-sm);
+}
+.reason-block.watch .reason-label{color:var(--lane)}
+.reason-block.watch .reason-copy{font-size:12.5px;color:rgba(255,255,255,.82)}
+.reason-block{display:grid;gap:6px}
+.reason-copy{
+  margin:0;
+  font-size:13.5px;
+  line-height:1.62;
+  color:rgba(255,255,255,.87);
+}
+/* 제품의 성공 조건이 걸린 행이다. 서랍이 아니라 카드 본문에 앉는다. */
+.action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--board-line);
+}
+.mini-btn{
+  border:2px solid var(--board-line);
+  border-radius:100px;
+  background:transparent;
+  color:var(--lane);
+  padding:10px 15px;
+  min-height:44px;
+  font-size:12.5px;
+  font-weight:750;
+  transition:border-color .18s var(--ease),background .18s var(--ease),color .18s var(--ease);
+}
+.mini-btn:hover{border-color:var(--lane-dim)}
+.mini-btn.primary{
+  border-color:var(--lane);
+  background:var(--lane);
+  color:var(--board);
+  margin-left:auto;
+}
+.mini-btn.primary:hover{background:var(--paper-2);border-color:var(--paper-2)}
+
+/* ── Gear Coach = 계측 전광판 ──────────────────────── */
+.compare-coach{
+  margin-top:24px;
+  padding:18px;
+  background:var(--board);
+  border-radius:var(--r-md);
+  border-top:4px solid var(--signal);
+}
+.compare-coach h3{margin-top:9px;color:var(--lane)}
+.compare-coach .small{color:rgba(255,255,255,.74)}
+.quick-prompts{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.quick-prompt{
+  border:2px solid var(--board-line);
+  border-radius:100px;
+  background:transparent;
+  color:var(--lane);
+  padding:10px 14px;
+  min-height:44px;
+  font-size:12.5px;
+  font-weight:700;
+  transition:border-color .18s var(--ease),background .18s var(--ease);
+}
+.quick-prompt:hover{border-color:var(--signal);background:rgba(245,183,34,.1)}
+.coach-answer{
+  margin-top:16px;
+  padding:15px;
+  background:var(--board-2);
+  border-radius:var(--r-sm);
+}
+.answer-lead{font-size:14.5px;line-height:1.5;font-weight:750;color:var(--lane)}
+.answer-body{margin:8px 0 0;font-size:13px;line-height:1.62;color:rgba(255,255,255,.82)}
+
+.notice{
+  margin-top:22px;
+  padding:12px 14px;
+  background:rgba(0,0,0,.18);
+  border-radius:var(--r-sm);
+  font-size:11.5px;
+  line-height:1.55;
+  color:rgba(255,255,255,.7);
+}
+.direction-list+.notice{margin-top:24px}
+
+/* ── 토스트 ───────────────────────────────────────── */
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:calc(102px + env(safe-area-inset-bottom));
+  transform:translate(-50%,14px);
+  z-index:90;
+  max-width:min(360px,90vw);
+  padding:13px 17px;
+  background:var(--board);
+  color:var(--lane);
+  border-radius:var(--r-sm);
+  font-size:13px;
+  line-height:1.5;
+  font-weight:650;
+  box-shadow:0 14px 36px rgba(0,0,0,.44);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .26s var(--ease),transform .26s var(--ease-out);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ── 데스크톱 ─────────────────────────────────────── */
+@media(min-width:431px){
+  body{
+    padding:28px 0;
+    background:
+      linear-gradient(90deg,transparent calc(50% - 306px),rgba(255,255,255,.16) calc(50% - 306px),rgba(255,255,255,.16) calc(50% - 302px),transparent calc(50% - 302px)),
+      linear-gradient(90deg,transparent calc(50% + 302px),rgba(255,255,255,.16) calc(50% + 302px),rgba(255,255,255,.16) calc(50% + 306px),transparent calc(50% + 306px)),
+      var(--track-deep);
+  }
+  /* 높은 창에서 .actions가 본문에서 수백 px 떨어져 미아가 되지 않도록
+     셸 높이에 상한을 둔다. 스타팅 블록은 화면 끝이 아니라 주로 끝에 있다. */
+  body{align-items:flex-start}
+  .app-shell{
+    min-height:min(calc(100dvh - 56px),860px);
+    border-radius:6px;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+  }
+  .screen{min-height:min(calc(100dvh - 56px),860px)}
+}
+@media(max-width:359px){
+  :root{--gutter:14px}
+  .screen{padding-left:calc(var(--gutter) + 10px);padding-right:calc(var(--gutter) + 10px)}
+  .metric-grid{gap:0 8px}
+  .overview-item{padding:12px 8px 14px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+</style>
+</head>
+<body>
+
+<!--
+IMPECCABLE DIRECTION CONTRACT — seed 10d4213a
+
+THESIS: 추천은 순위표가 아니라 나란히 놓인 레인이다. 트랙에서 레인 번호는
+등수가 아니라 배정이며, 이 화면은 "순위를 매기지 않는다"는 제품 원칙을
+처음으로 눈에 보이게 만든다. 거부하는 것: 피트니스 앱의 다크 UI + 네온 링,
+그리고 그 뻔한 반대편인 크림 페이퍼 + 콘덴스드 에디토리얼.
+
+OWN-WORLD: 지면이 폴리우레탄 주로다. 러스트 그라운드(#A63D25)에 고무 입자
+텍스처, 화면 전 높이를 관통하는 백색 스텐실 레인 라인 두 줄. 읽고 계측하는
+면은 차콜 전광판(#14171A), 계측 신호는 앰버(#F5B722). 디스플레이 보이스는
+라틴 대문자에 스텐실 브리지를 마스크로 내고, 한글에는 칠해진 페인트
+스트로크를 더해 만든다(웹폰트 미사용 결정에 따른 처리). 라운드 카드 없음,
+그라디언트 액센트 없음, 링 차트 없음.
+
+STORY: 나는 어떤 러너인지 5문항으로 확인하고, 러닝 정보를 더해 판정을
+확정한 뒤, 같은 출발선에서 갈라지는 세 갈래 장비 방향 중 하나를 고른다.
+
+FIRST VIEWPORT: 상단에 굵은 백색 스타트 라인이 화면을 가로지른다. 그 아래
+왼쪽에 페인트 스트로크가 깔린 헤드라인, 오른쪽에 살짝 기운 레인 배정 카드. 주로 위에는
+거리 마커처럼 5 QUESTIONS / 1 RUNNER CARD / 3 GEAR DIRECTIONS가 찍히고,
+기본 CTA는 스타팅 블록 자리인 화면 하단에 앉는다.
+
+FORM: 레인 배정 / Lane Assignment. 자체 도출 목록 3번(주사위 지정),
+seed key 10d4213a. code-led — 이미지 생성 도구 없음.
+
+RAISES: 카드 규격 통일(HyperCard) · 3방향 겹쳐 대조(입자검출기) ·
+포커스를 조명으로(외계 숲) · 진행을 하나의 축선으로(베르사유).
+
+FINISH: unreviewed and undocumented is unfinished; this build ends with the
+finish review, the verdict, DESIGN.md, and every shipping raster carrying its
+provenance.
+-->
+
+  <!-- aria-live를 앱 전체에 걸면 선택할 때마다 화면 전체가 다시 낭독된다.
+       화면 전환은 제목으로 포커스를 옮겨 알리고, 알림은 토스트가 맡는다. -->
+  <main id="app" class="app-shell"></main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+window.GM_DATA = {
+  // TYPE_RULE_v0.1 Core Type — 이름/카피 출처: prototype/js/i18n.ko.js (SSOT)
+  types: {
+    RHYTHM_MAKER: {
+      name: "RHYTHM MAKER",
+      tagline: "꾸준함으로 자신의 러닝 리듬을 만드는 러너",
+      copy: "한 번의 강한 러닝보다 꾸준히 이어가는 리듬이 강한 러너입니다. 지금의 루틴을 오래 유지하면서 필요한 순간 조금씩 강도를 높이는 스타일에 가깝습니다.",
+      focus: "꾸준한 흐름이 가장 큰 자산이 되는 중"
+    },
+    MOMENTUM_BUILDER: {
+      name: "MOMENTUM BUILDER",
+      tagline: "최근 러닝이 올라오고 있는 러너",
+      copy: "지금 러닝의 상승 구간에 있는 러너입니다. 아직 하나의 스타일로 굳어지기보다 거리와 페이스를 조금씩 확장하며 자신의 기준을 만들어가는 단계입니다.",
+      focus: "러닝이 한 단계 더 커지는 중"
+    },
+    DISTANCE_ARCHITECT: {
+      name: "DISTANCE ARCHITECT",
+      tagline: "더 멀리 달릴 기반을 설계하는 러너",
+      copy: "한 번의 최고 속도보다 더 멀리 안정적으로 달릴 수 있는 기반을 만드는 러너입니다. 속도만큼 지속성과 회복을 중요하게 보는 쪽에 가깝습니다.",
+      focus: "더 오래, 더 멀리 가는 기반을 쌓는 중"
+    },
+    PACE_TACTICIAN: {
+      name: "PACE TACTICIAN",
+      tagline: "목표를 위해 페이스를 전략적으로 쓰는 러너",
+      copy: "무조건 빠르게 달리기보다 목표 기록을 위해 거리와 페이스를 전략적으로 조절하는 러너에 가깝습니다.",
+      focus: "기록을 줄이는 재미가 커지는 중"
+    },
+    VERSATILE_EXPLORER: {
+      name: "VERSATILE EXPLORER",
+      tagline: "여러 러닝 방식을 탐색하는 러너",
+      copy: "아직 하나의 목표로 러닝을 정의하기보다 여러 방식으로 달려보며 자신에게 맞는 스타일을 찾아가는 러너입니다.",
+      focus: "나에게 맞는 방식을 찾아가는 중"
+    }
+  },
+
+  modifiers: {
+    COMFORT_FIRST: { name:"Comfort-First", desc:"편안함과 지속성을 상대적으로 중시하고 있어요." },
+    SPEED_CURIOUS: { name:"Speed-Curious", desc:"최근 속도와 기록 향상에 관심이 커지고 있어요." },
+    DISTANCE_UP:   { name:"Distance-Up",   desc:"달리는 거리를 넓혀가고 있어요." },
+    RACE_READY:    { name:"Race-Ready",    desc:"대회나 명확한 목표를 준비하고 있어요." }
+  },
+
+  questions: [
+    {
+      id: "q1",
+      text: "요즘 뛰러 나갈 때 제일 먼저 드는 생각은?",
+      field: "purpose",
+      options: [
+        {text:"오늘도 일단 뛰고 오자.", value:"HABIT"},
+        {text:"요즘은 하나씩 더 해보고 싶다.", value:"MIXED"},
+        {text:"오늘은 어디까지 가볼까?", value:"DISTANCE"},
+        {text:"오늘 페이스는 어느 정도로 갈까?", value:"PERFORMANCE"},
+        {text:"오늘도 목표에 맞춰 뛰어야지.", value:"RACE"}
+      ]
+    },
+    {
+      id: "q2",
+      text: "최근 한두 달, 내 러닝에서 가장 달라진 건?",
+      field: "trend",
+      options: [
+        {text:"크게 달라진 건 없이 꾸준히 뛰고 있다.", value:"SAME"},
+        {text:"러닝에 쓰는 시간이나 관심이 더 커졌다.", value:"UP"},
+        {text:"예전보다 오래, 멀리 뛰는 날이 많아졌다.", value:"UP"},
+        {text:"페이스나 기록을 더 신경 쓰게 됐다.", value:"UP"},
+        {text:"목표나 대회에 맞춰 훈련하기 시작했다.", value:"UP"}
+      ]
+    },
+    {
+      id: "q3",
+      text: "뛰고 나서 가장 기분 좋은 순간은?",
+      field: "purpose",
+      options: [
+        {text:"오늘도 안 빼먹고 뛰었다 싶을 때", value:"HABIT"},
+        {text:"러닝이 점점 내 일상이 되는 것 같을 때", value:"HEALTH"},
+        {text:"생각보다 더 멀리 갔을 때", value:"DISTANCE"},
+        {text:"기록이 조금이라도 좋아졌을 때", value:"PERFORMANCE"},
+        {text:"준비한 목표를 제대로 해냈을 때", value:"RACE"}
+      ]
+    },
+    {
+      id: "q4",
+      text: "주말에 러닝할 시간이 넉넉하다면 제일 하고 싶은 건?",
+      field: "purpose",
+      options: [
+        {text:"평소 코스를 편하게 한 번 뛰기", value:"HABIT"},
+        {text:"안 해본 코스나 훈련 해보기", value:"MIXED"},
+        {text:"평소보다 길게 달려보기", value:"DISTANCE"},
+        {text:"짧게라도 템포 올려보기", value:"PERFORMANCE"},
+        {text:"목표에 맞는 훈련 제대로 해보기", value:"RACE"}
+      ]
+    },
+    {
+      id: "q5",
+      text: "2~3개월 뒤, 어떤 변화가 제일 마음에 들 것 같아?",
+      field: "goal",
+      options: [
+        {text:"지금처럼 꾸준히 뛰는 흐름이 이어지는 것", value:"KEEP"},
+        {text:"러닝을 지금보다 한 단계 더 넓혀가는 것", value:"UNKNOWN"},
+        {text:"긴 거리가 더 자연스러워지는 것", value:"LONGER"},
+        {text:"같은 거리를 조금이라도 더 빠르게 뛰는 것", value:"RECORD"},
+        {text:"목표로 잡은 대회를 제대로 준비해 달리는 것", value:"RACE_PREP"}
+      ]
+    }
+  ],
+
+  shoes: [
+    "adidas Adizero EVO SL",
+    "ASICS NOVABLAST 5",
+    "Nike Pegasus 42",
+    "New Balance Fresh Foam X 1080 v15",
+    "Saucony Ride 19"
+  ],
+
+  scenarios: {
+    LONG: {
+      label:"LONG",
+      headline:"오래 달릴 때 어떤 편안함을 원하는지 비교해보세요.",
+      coach:"이번에는 빠른 느낌보다 오래 달릴 때의 편안함을 중심으로 세 방향을 볼게요.",
+      candidates:[
+        {
+          brand:"ASICS", product:"GEL-NIMBUS 28",
+          direction:"장거리 편안함을 우선한다면", micro:"LONG · COMFORT",
+          short:"장거리와 편안한 데일리 러닝을 중심으로 비교할 후보예요.",
+          current:"현재 신발보다 장거리 편안함을 더 우선하는 방향이에요.",
+          caution:"빠른 훈련이나 경쾌한 러닝감을 함께 원한다면 다른 두 방향도 같이 비교해보세요."
+        },
+        {
+          brand:"New Balance", product:"Fresh Foam X 1080 v15",
+          direction:"데일리와 장거리를 함께 가져가고 싶다면", micro:"DAILY + LONG",
+          short:"부드러운 착화감을 중심으로 데일리 러닝과 장거리를 함께 고려할 때 비교할 후보예요.",
+          current:"현재처럼 일상 활용은 유지하면서 편안한 발구름을 더 중심에 두는 방향이에요.",
+          caution:"반발감이나 빠른 페이스 훈련 비중이 높다면 활용 목적을 다시 비교해보면 좋아요."
+        },
+        {
+          brand:"ASICS", product:"SUPERBLAST 3",
+          direction:"장거리 외 빠른 훈련까지 활용하고 싶다면", micro:"LONG · VERSATILE",
+          short:"장거리뿐 아니라 템포 등 다양한 러닝까지 한 켤레의 활용 범위로 보고 싶을 때 비교할 후보예요.",
+          current:"장거리 대응을 가져가면서 훈련 활용 범위를 넓혀보는 방향이에요.",
+          caution:"편안함 하나를 가장 우선한다면 쿠션 중심 후보와 직접 비교해보세요."
+        }
+      ]
+    },
+
+    SPEED: {
+      label:"SPEED",
+      headline:"빠르게 달리고 싶은 방식에 따라 비교해보세요.",
+      coach:"이번에는 데일리 범용성보다 빠른 훈련과 기록 지향적인 느낌을 중심으로 세 방향을 볼게요.",
+      candidates:[
+        {
+          brand:"adidas", product:"EVO SL",
+          direction:"경량·반응성 중심으로 넘어가고 싶다면", micro:"LIGHT · RESPONSIVE",
+          short:"빠른 데일리 러닝과 템포·스피드 훈련 성격을 원할 때 비교할 후보예요.",
+          current:"현재 신발의 일상 훈련 역할에서 속도 훈련 쪽으로 성격을 이동하는 방향이에요.",
+          caution:"편안한 조깅까지 한 켤레로 모두 해결하려는 경우에는 데일리 범용성을 함께 비교해보세요."
+        },
+        {
+          brand:"Saucony", product:"Endorphin Speed 5",
+          direction:"빠른 훈련의 활용 범위를 넓히고 싶다면", micro:"TEMPO · TRAINING",
+          short:"템포런과 빠른 장거리 등 여러 종류의 빠른 훈련에 활용하고 싶을 때 비교할 후보예요.",
+          current:"현재 데일리 러닝 중심에서 업템포 훈련 비중을 높이는 방향이에요.",
+          caution:"느린 조깅을 가장 많이 하는 경우라면 빠른 훈련용과 데일리용의 역할을 구분해서 보면 좋아요."
+        },
+        {
+          brand:"PUMA", product:"Deviate NITRO 4",
+          direction:"플레이트 계열의 추진감을 경험하고 싶다면", micro:"PLATED · SPEED",
+          short:"카본 플레이트가 들어간 템포화로, 레이스 전 빠른 페이스 훈련에서의 러닝감을 경험하고 싶을 때 비교할 후보예요.",
+          current:"현재 신발에서 레이스에 가까운 빠른 훈련 성격으로 이동하는 방향이에요.",
+          caution:"모든 러닝에 사용하는 신발이라기보다 빠른 훈련 목적이 분명한지 먼저 확인해보세요."
+        }
+      ]
+    },
+
+    REPLACE: {
+      label:"REPLACE",
+      headline:"현재 역할은 유지하고, 느낌을 바꿔보세요.",
+      coach:"비슷한 역할은 유지하되 다음 신발에서 어떤 느낌을 바꾸고 싶은지 기준으로 세 방향을 볼게요.",
+      candidates:[
+        {
+          brand:"Mizuno", product:"Wave Rider 29",
+          direction:"익숙한 데일리 밸런스를 유지한다면", micro:"DAILY · BALANCED",
+          short:"쿠션과 안정적인 착지의 균형을 가진 기본 훈련용 후보로 비교할 수 있어요.",
+          current:"현재 신발의 데일리 역할을 크게 바꾸지 않는 방향이에요.",
+          caution:"다음 신발에서 확실히 다른 러닝감을 원한다면 다른 방향이 더 흥미로울 수 있어요."
+        },
+        {
+          brand:"New Balance", product:"Fresh Foam X 880 v15",
+          direction:"조금 더 안정적인 쿠션을 원한다면", micro:"DAILY · STABLE",
+          short:"중립 데일리 역할을 유지하면서 밀도 있고 안정적인 쿠션 성격을 원할 때 비교할 후보예요.",
+          current:"현재 신발의 일상 활용은 유지하면서 안정적인 착지 쪽을 더 의식하는 방향이에요.",
+          caution:"더 강한 반발감이나 빠른 러닝감을 원한다면 다른 후보와 비교하세요."
+        },
+        {
+          brand:"ASICS", product:"NOVABLAST 5",
+          direction:"데일리 러닝에 조금 더 재미를 주고 싶다면", micro:"DAILY · BOUNCY",
+          short:"기본 데일리 용도는 유지하면서 반발감 있는 러닝감을 더해보고 싶을 때 비교할 후보예요.",
+          current:"현재 신발과 비슷한 일상 활용을 가져가면서 러닝감의 변화를 더 느껴보는 방향이에요.",
+          caution:"안정감을 가장 우선한다면 다른 두 후보의 방향과 함께 비교하는 것이 좋아요."
+        }
+      ]
+    },
+
+    RACE: {
+      label:"RACE",
+      headline:"레이스에 얼마나 집중할지에 따라 비교해보세요.",
+      coach:"이번에는 대회에서 사용할 장비를 기준으로 레이스 전용성과 활용 범위가 다른 세 방향을 볼게요.",
+      candidates:[
+        {
+          brand:"Saucony", product:"Endorphin Pro 5",
+          direction:"훈련화에서 레이스 전용으로 넘어가고 싶다면", micro:"RACE · CARBON",
+          short:"카본 플레이트 기반으로 하프·마라톤 기록 단축과 빠른 페이스 유지를 목표로 할 때 비교할 후보예요.",
+          current:"현재 신발에서 레이스 전용 성격을 더 분명하게 가져가는 방향이에요.",
+          caution:"데일리 훈련까지 한 켤레로 해결하려는 목적이라면 역할이 너무 레이스에 치우치지 않는지 확인해보세요."
+        },
+        {
+          brand:"ASICS", product:"METASPEED SKY TOKYO",
+          direction:"기록 단축 중심의 최상급 레이스화를 보고 싶다면", micro:"RACE · PERFORMANCE",
+          short:"마라톤 기록 단축이 목적인 최경량 카본 레이스 후보예요.",
+          current:"현재 신발의 훈련 활용보다 대회 퍼포먼스에 더 집중하는 방향이에요.",
+          caution:"대회용 신발은 실제 발 형태와 착화감의 영향을 크게 받을 수 있으므로 구매 전 시착과 실제로 뛰어보길 권해요."
+        },
+        {
+          brand:"ASICS", product:"Magic Speed 5",
+          direction:"레이스 입문과 빠른 훈련을 함께 보고 싶다면", micro:"RACE + TRAINING",
+          short:"레이스 입문과 스피드 훈련을 함께 고려하고 싶을 때 비교할 수 있는 카본·템포 성격의 후보예요.",
+          current:"완전한 레이스 전용보다는 빠른 훈련과 대회 사이의 활용 범위를 남기는 방향이에요.",
+          caution:"순수 레이스 퍼포먼스만을 가장 중요하게 본다면 다른 두 후보와 직접 비교해보세요."
+        }
+      ]
+    }
+  }
+};
+
+/* ============================================================
+   TYPE_RULE_v0.1 — prototype/js/type-rule.js 를 그대로 옮긴 것.
+   규칙(가점표·Modifier·동점 해소 순서)은 한 줄도 바꾸지 않는다.
+
+   05 §6.5: "하나의 질문 답변만으로 Type을 결정하지 않는다."
+   05 §2.7 / §6.5 · D-01: Runner Type은 Identity Layer다.
+   Recommendation Score에 절대 투입하지 않는다.
+   ============================================================ */
+window.GM_TYPE_RULE = (() => {
+  const RULE_VERSION = "TYPE_RULE_v0.1";
+
+  const CORE_TYPES = [
+    "MOMENTUM_BUILDER",
+    "PACE_TACTICIAN",
+    "DISTANCE_ARCHITECT",
+    "RHYTHM_MAKER",
+    "VERSATILE_EXPLORER"
+  ]; // 동점 시 이 순서로 해소한다
+
+  // [id, 조건, Core Type, 가점, 근거로 인용할 답변 필드]
+  const RULES = [
+    ["trendUp",        a => a.trend === "UP",                                          "MOMENTUM_BUILDER", 3, "trend"],
+    ["newRunner",      a => a.experience === "LT_3M" || a.experience === "M3_12",       "MOMENTUM_BUILDER", 2, "experience"],
+
+    ["steadyFreq",     a => (a.frequency === "W3_4" || a.frequency === "GTE_5") && a.trend === "SAME",
+                                                                                       "RHYTHM_MAKER", 3, "frequency"],
+    ["routinePurpose", a => a.purpose === "HEALTH" || a.purpose === "HABIT",            "RHYTHM_MAKER", 2, "purpose"],
+
+    ["distPurpose",    a => a.purpose === "DISTANCE",                                   "DISTANCE_ARCHITECT", 3, "purpose"],
+    ["longTarget",     a => a.interestDistance === "HALF" || a.interestDistance === "FULL",
+                                                                                       "DISTANCE_ARCHITECT", 2, "interestDistance"],
+    ["highVolume",     a => a.weekly === "GTE_30",                                      "DISTANCE_ARCHITECT", 2, "weekly"],
+    ["goalLonger",     a => a.goal === "LONGER",                                        "DISTANCE_ARCHITECT", 2, "goal"],
+
+    ["perfPurpose",    a => a.purpose === "PERFORMANCE" || a.purpose === "RACE",        "PACE_TACTICIAN", 3, "purpose"],
+    ["goalRecord",     a => a.goal === "RECORD",                                        "PACE_TACTICIAN", 2, "goal"],
+
+    ["mixedPurpose",   a => a.purpose === "MIXED",                                      "VERSATILE_EXPLORER", 3, "purpose"],
+    ["undecided",      a => a.goal === "UNKNOWN" || a.interestDistance === "UNKNOWN",   "VERSATILE_EXPLORER", 1, "goal"]
+  ];
+
+  // Modifier — 우선순위 순으로 첫 매칭 하나만 부여한다.
+  const MODIFIER_RULES = [
+    ["RACE_READY",    a => a.goal === "RACE_PREP" ||
+                           (a.purpose === "RACE" && (a.interestDistance === "HALF" || a.interestDistance === "FULL"))],
+    ["SPEED_CURIOUS", a => a.goal === "RECORD" || a.purpose === "PERFORMANCE"],
+    ["DISTANCE_UP",   a => a.goal === "LONGER" || (a.trend === "UP" && a.purpose === "DISTANCE")],
+    ["COMFORT_FIRST", () => true]
+  ];
+
+  // 결과 화면에서 "왜 이 타입인가"를 사용자의 실제 답으로 되짚기 위한 라벨.
+  // 새 데이터를 만들지 않고, 이미 답한 것만 인용한다. (09 §33 Show Me Why)
+  const FIELD_LABEL = {
+    trend:"최근 러닝 변화", experience:"러닝 경력", frequency:"주간 러닝 횟수",
+    purpose:"러닝 목적", interestDistance:"관심 거리", weekly:"주간 러닝량", goal:"다음 목표"
+  };
+
+  function evaluate(answers){
+    const a = answers || {};
+    const scores = {};
+    const fired = [];
+    CORE_TYPES.forEach(t => scores[t] = 0);
+
+    RULES.forEach(([id, cond, coreType, points, field]) => {
+      if(cond(a)){
+        scores[coreType] += points;
+        fired.push({id, coreType, points, field});
+      }
+    });
+
+    // 최고점. 동점이면 CORE_TYPES 순서가 앞선 쪽.
+    let best = CORE_TYPES[0];
+    for(let i=1;i<CORE_TYPES.length;i++){
+      if(scores[CORE_TYPES[i]] > scores[best]) best = CORE_TYPES[i];
+    }
+    // 아무 조건도 맞지 않아 전부 0점이면 탐색 단계로 본다.
+    if(scores[best] === 0) best = "VERSATILE_EXPLORER";
+
+    let modifier = "COMFORT_FIRST";
+    for(const [name, cond] of MODIFIER_RULES){
+      if(cond(a)){ modifier = name; break; }
+    }
+
+    const evidence = fired
+      .filter(f => f.coreType === best)
+      .sort((x,y) => y.points - x.points);
+
+    return {coreType:best, modifier, scores, evidence, ruleVersion:RULE_VERSION};
+  }
+
+  return {version:RULE_VERSION, coreTypes:CORE_TYPES, evaluate, fieldLabel:FIELD_LABEL};
+})();
+</script>
+  <script>
+(() => {
+  const D = window.GM_DATA;
+  const TYPE_RULE = window.GM_TYPE_RULE;
+  const app = document.getElementById("app");
+  const toast = document.getElementById("toast");
+  const INPUT_MAP_VERSION = "INPUT_MAP_v0.1";
+  /* 버전은 화면에서 내렸지만 추적은 남긴다 — 과거 추천 화면을 재현할 수
+     있어야 한다는 것이 이 프로젝트에서 가장 비싼 요구사항이다. */
+  window.GM_VERSIONS = {typeRule:TYPE_RULE.version, inputMap:INPUT_MAP_VERSION};
+
+  const state = {
+    screen:"landing",
+    questionIndex:0,
+    answers:[null,null,null,null,null],
+    interestDistance:null,
+    typeResult:null,      // TYPE_RULE_v0.1 evaluate() 결과
+    typeStage:null,       // "provisional" | "confirmed"
+    typeShift:null,       // 프로필 반영으로 타입이 바뀌었을 때의 직전 결과
+    profile:{
+      experience:null,
+      runs:null,
+      weekly:null,
+      shoe:null,
+      shoeStatus:null
+    },
+    profileStep:1,
+    shoeQuery:"",
+    gearNeed:null,
+    freeGearQuery:"",
+    gearPriority:null,
+    scenario:null,
+    needFollowup:null,
+    coachFollowup:null,
+    raceDistance:null,
+    compareQuestion:"",
+    compareAnswer:null,
+    returningNickname:"",
+    returningPin:"",
+    activity:{
+      weeklyKm:null,
+      runs:null,
+      shoeMileage:null,
+      lastRunKm:null,
+      lastRunShoe:null
+    },
+    runEntry:{
+      distance:"",
+      shoe:null
+    }
+  };
+
+  function esc(v=""){
+    return String(v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+  }
+
+  /* 레인 배정 마크 — 세 줄이 그어진 한 구획 */
+  function gmMark(){
+    return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="21" height="21" stroke="currentColor" stroke-width="2.4"/>
+      <path d="M7.2 1.5v21M12 1.5v21M16.8 1.5v21" stroke="currentColor" stroke-width="2.4"/>
+    </svg>`;
+  }
+
+  function topbar(backFn, right=""){
+    return `
+      <div class="topbar">
+        ${backFn ? `<button class="back" data-action="${backFn}">← 뒤로</button>` : `<span></span>`}
+        <div class="brand">${gmMark()}GearMatch AI</div>
+        ${right || `<span></span>`}
+      </div>`;
+  }
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>toast.classList.remove("show"), 2200);
+  }
+
+  function selectButton(value, selected, attr="value"){
+    return `data-${attr}="${esc(value)}" class="option ${selected===value ? "selected":""}"`;
+  }
+
+  /* 러닝화 측면 — 토(왼쪽)에서 힐(오른쪽)로. 두꺼운 웨지 미드솔이 러닝화의
+     가장 강한 단서라 실루엣과 분리해 따로 칠한다. */
+  function shoeSvg(cls="shoe-mark"){
+    return `<svg class="${cls}" viewBox="0 0 320 140" aria-hidden="true">
+      <!-- 어퍼 -->
+      <path d="M28 100c-1-14 8-25 24-29l94-18c16-3 28-9 38-18l14-13 10 20c5 10 17 13 26 6l18-14c10 9 17 22 21 37 2 9 3 19 3 29Z"
+            fill="currentColor" opacity=".92"/>
+      <!-- 미드솔 웨지 : 힐이 두껍고 토가 들린다 -->
+      <path d="M26 98h258c17 0 30 13 30 29 0 6-5 11-11 11H50c-16 0-29-13-29-29 0-4 2-8 5-11Z"
+            fill="currentColor"/>
+      <!-- 아웃솔 -->
+      <path d="M40 128h240" stroke="rgba(0,0,0,.42)" stroke-width="7" stroke-linecap="round"/>
+      <!-- 미드솔 분리선 -->
+      <path d="M28 100h256" stroke="rgba(0,0,0,.28)" stroke-width="5" stroke-linecap="round"/>
+      <!-- 레이스 -->
+      <g stroke="rgba(0,0,0,.32)" stroke-width="7" stroke-linecap="round">
+        <path d="M146 62l28 11M160 48l27 11M175 34l25 11"/>
+      </g>
+      <!-- 힐 탭 -->
+      <path d="M244 34h24" stroke="rgba(0,0,0,.3)" stroke-width="6" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  /* 주로에 칠해진 거리 마커 — 스텐실 숫자와 눈금 */
+  /* 스타팅 블록 — 주로에 고정되는 두 개의 각진 발판 */
+  function startBlockSvg(){
+    return `<svg viewBox="0 0 44 24" fill="none" aria-hidden="true">
+      <path d="M2 22h40" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>
+      <path d="M6 22V12l11-5v15" fill="currentColor"/>
+      <path d="M22 22V8l12-6v20" fill="currentColor" opacity=".62"/>
+    </svg>`;
+  }
+
+  function laneMarkSvg(){
+    return `<svg viewBox="0 0 86 200" fill="none" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="4" stroke-linecap="square">
+        <path d="M4 0v200"/>
+        <path d="M4 24h56M4 68h40M4 112h28M4 156h18M4 192h10"/>
+      </g>
+    </svg>`;
+  }
+
+  function runnerSvg(cls="runner-line"){
+    return `<svg class="${cls}" viewBox="0 0 180 210" aria-hidden="true">
+      <circle cx="111" cy="28" r="13" fill="currentColor"/>
+      <path d="M103 47 84 84l24 24 20-43M88 82 54 67M108 108l-35 41-26 37M109 109l29 30 16 45" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M53 67 30 93M128 65l20 35" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  function progressHTML(current,total=5,phase="러너 타입"){
+    return `<div class="progress-row">
+      <div class="progress-meta">
+        <span class="progress-phase">${esc(phase)}</span>
+        <span class="progress-count">0${current} / 0${total}</span>
+      </div>
+      <div class="track-progress" role="progressbar"
+           aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${current}"
+           aria-label="${esc(phase)} ${total}단계 중 ${current}단계"
+           style="grid-template-columns:repeat(${total},1fr)">
+        ${Array.from({length:total},(_,i)=>{
+          const n=i+1;
+          return `<span class="track-stop ${n<current?"done":n===current?"current":""}"></span>`;
+        }).join("")}
+      </div>
+    </div>`;
+  }
+
+  function compactButtons(values,selected,attr){
+    return `<div class="compact-grid">${values.map(v=>`<button class="compact-option ${selected===v?"selected":""}" data-${attr}="${esc(v)}">${esc(v)}</button>`).join("")}</div>`;
+  }
+
+  /* 화면이 실제로 바뀔 때만 맨 위로 되돌린다.
+     같은 화면 안의 상태 변경(선택, 상세 토글, 코치 답변)에서 스크롤을
+     0으로 보내면 사용자가 방금 누른 것을 놓친다. scroll-behavior:smooth와
+     겹치면 2000px를 거슬러 올라가는 애니메이션이 된다. */
+  let lastViewKey = null;
+  let pendingReveal = null;
+
+  function viewKey(){
+    return [state.screen, state.profileStep, state.questionIndex].join("/");
+  }
+
+  /* 전환 후 포커스를 새 화면의 제목에 둔다.
+     이게 없으면 키보드·스크린리더 사용자는 매번 문서 최상단으로 떨어진다. */
+  function focusScreenHeading(){
+    const h = app.querySelector("h1,h2");
+    if(!h) return;
+    h.setAttribute("tabindex","-1");
+    h.setAttribute("data-screen-heading","");
+    try{ h.focus({preventScroll:true}); }catch(_){ h.focus(); }
+  }
+
+  function render(){
+    const key = viewKey();
+    const changed = key !== lastViewKey;
+    if(changed) window.scrollTo({top:0,behavior:"auto"});
+    lastViewKey = key;
+    const views = {
+      landing: renderLanding,
+      returningLogin: renderReturningLogin,
+      question: renderQuestion,
+      distanceCheck: renderDistanceCheck,
+      reveal: renderReveal,
+      cardLite: () => renderCard(false),
+      profile: renderProfile,
+      cardComplete: () => renderCard(true),
+      runEntry: renderRunEntry,
+      gearNeed: renderGearNeed,
+      gearPriority: renderGearPriority,
+      needFollowup: renderNeedFollowup,
+      coach: renderCoach,
+      recommendation: renderRecommendation
+    };
+    (views[state.screen] || renderLanding)();
+
+    fitDisplayTitles();
+    if(changed) focusScreenHeading();
+
+    /* 같은 화면 안에서 새로 나타난 것은 사용자 시야로 데려온다.
+       innerHTML 대입은 동기라 레이아웃이 이미 잡혀 있다 —
+       rAF에 맡기면 탭이 배경일 때 콜백이 아예 돌지 않는다. */
+    if(pendingReveal){
+      const el = app.querySelector(pendingReveal);
+      pendingReveal = null;
+      if(el) el.scrollIntoView({block:"center", behavior: reducedMotion() ? "auto" : "smooth"});
+    }
+  }
+
+  function renderLanding(){
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar()}
+        <div class="landing-copy">
+          <h1>나는 어떤<br>러너일까?</h1>
+          <p class="body">지금의 러닝 스타일을 확인하고<br><strong>나를 이해하면, 장비 선택이 달라져요.</strong></p>
+        </div>
+
+        <div class="hero-stage">
+          <div class="campaign-word">${laneMarkSvg()}</div>
+          <div class="hero-caption">
+            <span>5 QUESTIONS</span>
+            <span>1 RUNNER CARD</span>
+            <span>3 GEAR DIRECTIONS</span>
+          </div>
+          <div class="preview-card">
+            <div class="preview-kicker">RUNNER CARD</div>
+            <div class="preview-title stencil" data-fit-title="27">PACE<br>TACTICIAN</div>
+            ${runnerSvg()}
+            ${shoeSvg()}
+            <div class="preview-metric">이번 주 —&nbsp;&nbsp;·&nbsp;&nbsp;신발 —</div>
+          </div>
+        </div>
+
+        <div class="landing-cta">
+          <button class="btn block-cta" data-action="startTest">
+            <span class="block-mark">${startBlockSvg()}</span>
+            <span>내 Runner Card 만들기</span>
+          </button>
+          <button class="returning-entry" data-action="openReturningLogin">이미 Runner Card가 있어요 <span>ENTER →</span></button>
+          <div class="landing-meta"><span>약 1분</span><span>결과는 바로 카드로</span></div>
+          <div class="dev-note">프로토타입이라 입력한 내용은 저장되지 않아요.</div>
+        </div>
+      </section>`;
+  }
+
+  function renderReturningLogin(){
+    const ready = state.returningNickname.trim().length > 0 && /^\d{4}$/.test(state.returningPin);
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("returningBack")}
+        <div class="returning-intro">
+          <h2>내 Runner Card로<br>다시 들어가기</h2>
+          <p class="body">닉네임과 4자리 PIN으로<br><strong>쌓아둔 러닝 기록을 이어서 볼 수 있어요.</strong></p>
+        </div>
+
+        <div class="returning-form">
+          <label class="line-field">
+            <span class="line-label">NICKNAME</span>
+            <input id="returningNickname" value="${esc(state.returningNickname)}" placeholder="닉네임" autocomplete="off" />
+          </label>
+          <label class="line-field pin">
+            <span class="line-label">4-DIGIT PIN</span>
+            <input id="returningPin" value="${esc(state.returningPin)}" placeholder="0000" maxlength="4" inputmode="numeric" autocomplete="off" />
+          </label>
+          <div class="login-hint">회원가입 대신 닉네임과 4자리 PIN으로 다시 들어오는 흐름을 시험해보는 중이에요. 프로토타입이라 아무 값이나 넣어도 열립니다.</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" data-action="loadExistingRunner" ${ready?"":"disabled"}>내 Runner Card 열기</button>
+        </div>
+      </section>`;
+  }
+
+  function renderQuestion(){
+    const q = D.questions[state.questionIndex];
+    const selected = state.answers[state.questionIndex];
+    const last = state.questionIndex === 4;
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("questionBack")}
+        ${progressHTML(state.questionIndex+1,5,"러너 타입")}
+        <div class="question-body">
+          <h2>${esc(q.text)}</h2>
+          <div class="stack section-gap" role="radiogroup" aria-label="${esc(q.text)}">
+            ${q.options.map((o,i)=>`
+              <button type="button" role="radio" aria-checked="${selected===i}"
+                data-option-index="${i}" class="option ${selected===i ? "selected":""}">${esc(o.text)}</button>
+            `).join("")}
+          </div>
+          <p class="flow-hint">고르면 ${last ? "결과로 넘어가요" : "바로 다음 문항으로 넘어가요"}. 다시 고르려면 위 <strong>뒤로</strong>를 누르세요.</p>
+        </div>
+      </section>`;
+  }
+
+  /* 자동 넘김 — 고르면 확정 모션 한 박자 뒤 다음 문항으로.
+     같은 화면에서 다른 보기를 누르면 타이머가 취소되므로 잘못 눌러도 되돌릴 수 있다. */
+  let advanceTimer = null;
+  function cancelAdvance(){ clearTimeout(advanceTimer); advanceTimer = null; }
+
+  function scheduleAdvance(){
+    cancelAdvance();
+    advanceTimer = setTimeout(()=>{
+      advanceTimer = null;
+      stepAfterQuestion();
+      render();
+    }, 280);
+  }
+
+  function stepAfterQuestion(){
+    if(state.answers[state.questionIndex]===null) return;
+    if(state.questionIndex < 4){ state.questionIndex++; return; }
+    if(needsDistanceQuestion()){ state.screen="distanceCheck"; return; }
+    goToResult();
+  }
+
+  function reducedMotion(){
+    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  /* 판정 결과는 이 제품의 감정적 정점이다. 다른 화면과 같은 페이드로
+     지나가지 않도록 레인이 배정되는 한 박자를 둔다. */
+  let revealTimer = null;
+  function goToResult(){
+    evaluateType("provisional");
+    if(reducedMotion()){ state.screen="cardLite"; return; }
+    state.screen="reveal";
+    clearTimeout(revealTimer);
+    revealTimer = setTimeout(()=>{
+      revealTimer = null;
+      state.screen="cardLite";
+      render();
+    }, 1250);
+  }
+
+  function renderReveal(){
+    const p = D.types[typeKey()];
+    app.innerHTML = `
+      <section class="screen reveal-screen">
+        <div class="reveal-stage">
+          <div class="reveal-sweep" aria-hidden="true"></div>
+          <div class="reveal-label">레인 배정</div>
+          <div class="reveal-type stencil" data-fit-title="${typeTitleSize()}" data-fit-uniform>${esc(p.name)}</div>
+          <div class="reveal-marks" aria-hidden="true">
+            ${Array.from({length:5},(_,i)=>`<span style="animation-delay:${.16+i*.075}s"></span>`).join("")}
+          </div>
+        </div>
+        <p class="sr-only" role="status">${esc(p.name)} — 결과 카드를 여는 중입니다.</p>
+      </section>`;
+  }
+
+  /* ── INPUT_MAP_v0.1 ──────────────────────────────────────
+     화면의 답변을 TYPE_RULE_v0.1이 읽는 필드로 옮기는 매핑.
+     규칙 자체는 건드리지 않는다. 매핑을 바꾸면 이 버전을 올린다.
+
+     purpose는 Q1·Q3·Q4 세 문항의 최빈값으로 정한다.
+     "하나의 질문 답변만으로 Type을 결정하지 않는다"(05 §6.5)를
+     purpose 단일 필드 안에서도 지키기 위한 것이다.
+     동률이면 가장 직접적인 질문인 Q1의 답을 쓴다.
+     ───────────────────────────────────────────────────────── */
+  const PROFILE_MAP = {
+    experience:{"3개월 미만":"LT_3M","3개월~1년":"M3_12","1~3년":"Y1_3","3년 이상":"GT_3Y"},
+    runs:{"주 1회 이하":"LT_1","주 1~2회":"W1_2","주 3~4회":"W3_4","주 5회 이상":"GTE_5"},
+    weekly:{"5km 미만":"LT_5","5~15km":"D5_15","15~30km":"D15_30","30km 이상":"GTE_30","잘 모르겠어요":"UNKNOWN"}
+  };
+
+  function specAnswersFromTest(){
+    const a = {};
+    const purposeVotes = [];
+    state.answers.forEach((idx, qi)=>{
+      if(idx===null) return;
+      const q = D.questions[qi];
+      const opt = q.options[idx];
+      if(!q.field || !opt) return;
+      if(q.field==="purpose") purposeVotes.push(opt.value);
+      else a[q.field] = opt.value;
+    });
+    if(purposeVotes.length){
+      const count = {};
+      purposeVotes.forEach(v => count[v] = (count[v]||0)+1);
+      let best = purposeVotes[0];
+      purposeVotes.forEach(v => { if(count[v] > count[best]) best = v; });
+      a.purpose = best;
+    }
+    return a;
+  }
+
+  function buildSpecAnswers(){
+    const a = specAnswersFromTest();
+    if(state.interestDistance) a.interestDistance = state.interestDistance;
+    const p = state.profile;
+    if(p.experience) a.experience = PROFILE_MAP.experience[p.experience];
+    if(p.runs)       a.frequency  = PROFILE_MAP.runs[p.runs];
+    // 프로필을 건너뛴 경우 Gear Coach 단계에서 받은 주간 러닝량을 쓴다.
+    const weeklyLabel = p.weekly || state.coachFollowup;
+    if(weeklyLabel)  a.weekly     = PROFILE_MAP.weekly[weeklyLabel];
+    return a;
+  }
+
+  /* 대회·목표 지향 답변일 때만 관심 거리를 한 번 묻는다.
+     longTarget 가점과 RACE_READY Modifier가 이 값을 필요로 한다. */
+  function needsDistanceQuestion(){
+    if(state.interestDistance) return false;
+    const a = specAnswersFromTest();
+    return a.purpose==="RACE" || a.goal==="RACE_PREP";
+  }
+
+  function evaluateType(stage){
+    const prev = state.typeResult;
+    const result = TYPE_RULE.evaluate(buildSpecAnswers());
+    state.typeShift = (stage==="confirmed" && prev &&
+      (prev.coreType!==result.coreType || prev.modifier!==result.modifier)) ? prev : null;
+    state.typeResult = result;
+    state.typeStage = stage;
+  }
+
+  function typeKey(){ return state.typeResult?.coreType || "VERSATILE_EXPLORER"; }
+  function modifierKey(){ return state.typeResult?.modifier || "COMFORT_FIRST"; }
+
+  function renderDistanceCheck(){
+    const opts = [
+      ["5K","5K"],
+      ["10K","10K"],
+      ["HALF","하프"],
+      ["FULL","풀"],
+      ["UNKNOWN","아직 정하지 않았어요"]
+    ];
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("distanceCheckBack")}
+        <h2>요즘 마음이 가는<br>거리가 있나요?</h2>
+        <p class="body">대회명이나 날짜는 묻지 않아요.<br>거리 하나만 알면 결과가 더 정확해져요.</p>
+        <div class="question-body">
+          <div class="stack section-gap" role="radiogroup" aria-label="관심 있는 거리">
+            ${opts.map(([v,t])=>`<button type="button" role="radio" aria-checked="${state.interestDistance===v}" class="option ${state.interestDistance===v?"selected":""}" data-interest-distance="${v}">${t}</button>`).join("")}
+          </div>
+          <p class="flow-hint">고르면 바로 결과로 넘어가요.</p>
+        </div>
+      </section>`;
+  }
+
+  /* 범위로 답한 것은 범위로 남는다. 실제 RUN을 더하기 전에는 확정 수치가 없다.
+     (개발 원칙 4 — Source 없는 값을 채우지 않는다. NULL/UNKNOWN은 정상 상태다) */
+  function ensureActivityBase(){ /* 더 이상 추정치를 만들지 않는다 */ }
+
+  /* 기록이 있으면 기록을, 없으면 답한 범위를, 그것도 없으면 — 를 보여준다. */
+  function weeklyDisplay(){
+    if(state.activity.weeklyKm!==null) return {value:fmtKm(state.activity.weeklyKm), note:"기록 합계"};
+    if(state.profile.weekly && state.profile.weekly!=="잘 모르겠어요") return {value:state.profile.weekly, note:"답변 범위"};
+    if(state.coachFollowup && state.coachFollowup!=="잘 모르겠어요") return {value:state.coachFollowup, note:"답변 범위"};
+    return {value:"—", note:"RUN을 더하면 채워져요"};
+  }
+
+  function runsDisplay(){
+    if(state.activity.runs!==null) return {value:`${state.activity.runs}회`, note:"기록 합계"};
+    if(state.profile.runs) return {value:state.profile.runs, note:"답변 범위"};
+    return {value:"—", note:"RUN을 더하면 채워져요"};
+  }
+
+  function fmtKm(v){
+    if(v===null || v===undefined) return null;
+    return `${Number(v).toFixed(1).replace(/\.0$/,"")} KM`;
+  }
+
+  function identityMetrics(coreType){
+    const map = {
+      RHYTHM_MAKER:{focus:"리듬",style:"꾸준함",drive:"습관",next:"흐름 잇기"},
+      MOMENTUM_BUILDER:{focus:"상승",style:"확장 중",drive:"호기심",next:"범위 넓히기"},
+      DISTANCE_ARCHITECT:{focus:"지구력",style:"거리",drive:"더 멀리",next:"기반 쌓기"},
+      PACE_TACTICIAN:{focus:"페이스",style:"전략",drive:"기록",next:"더 빠르게"},
+      VERSATILE_EXPLORER:{focus:"다양성",style:"유연함",drive:"탐색",next:"섞어보기"}
+    };
+    return map[coreType] || map.VERSATILE_EXPLORER;
+  }
+
+  /* 타입 이름 길이에 따라 카드 타이틀 크기를 낮춘다.
+     DISTANCE ARCHITECT / VERSATILE EXPLORER 는 기본 크기에서 넘친다. */
+  /* 상한값. 실제 크기는 fitDisplayTitles가 가장 긴 이름 기준으로 확정한다. */
+  function typeTitleSize(){ return 52; }
+
+  const TYPE_NAMES = Object.keys(D.types).map(k => D.types[k].name);
+
+  /* 카드 규격은 타입마다 흔들리면 안 된다(direction contract — 카드 규격 통일).
+     그래서 크기를 "가장 긴 타입 이름이 들어가는 값"으로 한 번 정하고 다섯 타입에
+     똑같이 쓴다. 길이 기반 표는 출발점이고, 실제 렌더 폭이 보증이다 —
+     서체가 바뀌면 글자폭도 바뀌므로 표만 믿으면 이름이 잘린다. */
+  /* 실측은 Range로 한다. overflow:visible 블록에서 scrollWidth는 가로 넘침을
+     신뢰할 수 있게 반영하지 않아, 320px에서 이름이 잘린 채로 통과했다.
+     Range 사각형의 폭은 줄바꿈된 텍스트의 "가장 넓은 줄" 폭이라 정확하다. */
+  function widestLine(el){
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const w = range.getBoundingClientRect().width;
+    range.detach && range.detach();
+    return w;
+  }
+
+  function fitDisplayTitles(){
+    app.querySelectorAll("[data-fit-title]").forEach(el=>{
+      const uniform = el.hasAttribute("data-fit-uniform");
+      const original = uniform ? el.textContent : null;
+
+      /* 가장 넓은 이름은 글자 수가 아니라 글자 폭으로 정해진다 —
+         MOMENTUM은 DISTANCE ARCHITECT보다 짧아도 M이 둘이라 더 넓다.
+         그래서 다섯 이름을 전부 재고 그중 최댓값에 맞춘다. */
+      const probes = uniform ? TYPE_NAMES : [null];
+      const room = el.clientWidth;
+      let size = Number(el.dataset.fitTitle) || 52;
+      let guard = 40;
+
+      const overflows = () => {
+        let worst = 0;
+        probes.forEach(name => {
+          if(name !== null) el.textContent = name;
+          worst = Math.max(worst, widestLine(el));
+        });
+        return worst > room + 0.5;
+      };
+
+      el.style.setProperty("--type-size", size + "px");
+      while(guard-- && size > 20 && overflows()){
+        size -= 2;
+        el.style.setProperty("--type-size", size + "px");
+      }
+
+      if(original !== null) el.textContent = original;
+    });
+  }
+
+  /* 앞 글자의 받침 유무로 조사를 고른다. */
+  function josa(word, withBatchim, withoutBatchim){
+    const ch = String(word).trim().slice(-1).charCodeAt(0);
+    if(!(ch >= 0xac00 && ch <= 0xd7a3)) return withoutBatchim;
+    return (ch - 0xac00) % 28 ? withBatchim : withoutBatchim;
+  }
+
+  /* 사용자가 실제로 답한 것만 인용한다. 새 데이터를 만들지 않는다. */
+  function typeEvidenceHTML(){
+    const ev = state.typeResult?.evidence || [];
+    if(!ev.length) return "";
+    const seen = new Set();
+    const fields = ev.map(e=>TYPE_RULE.fieldLabel[e.field]).filter(l=>{
+      if(!l || seen.has(l)) return false;
+      seen.add(l); return true;
+    }).slice(0,3);
+    if(!fields.length) return "";
+    const joined = fields.join(" · ");
+    return `<div class="type-evidence">답변 중 <strong>${esc(joined)}</strong>${josa(fields[fields.length-1],"이","가")} 이 타입으로 이어졌어요.</div>`;
+  }
+
+  function typeCardHTML(complete){
+    const coreType = typeKey();
+    const p = D.types[coreType];
+    const mod = D.modifiers[modifierKey()];
+    const profile = state.profile;
+    const identity = identityMetrics(coreType);
+    if(complete) ensureActivityBase();
+    const metric = (label, value, sub="") => `
+      <div class="metric">
+        <div class="metric-label">${label}</div>
+        <div class="metric-value ${value ? "filled":""}">${esc(value)}${sub ? `<span class="metric-sub">${esc(sub)}</span>` : ""}</div>
+      </div>`;
+    const identityGrid = `
+      ${metric("지금 초점", identity.focus)}
+      ${metric("러닝 스타일", identity.style)}
+      ${metric("동기", identity.drive)}
+      ${metric("다음 방향", identity.next)}`;
+    const wk = weeklyDisplay(), rn = runsDisplay();
+    const activityGrid = `
+      ${metric("이번 주", wk.value, wk.note)}
+      ${metric("러닝 횟수", rn.value, rn.note)}
+      ${metric("러닝 경력", profile.experience || "—")}
+      ${metric("현재 신발", profile.shoeStatus==="none" ? "러닝화 없음" : profile.shoeStatus==="unknown" ? "잘 모름" : profile.shoe || "—", profile.shoe ? (state.activity.shoeMileage!==null ? `이 앱에 기록된 ${fmtKm(state.activity.shoeMileage)}` : "누적 거리 기록 없음") : "")}`;
+    return `
+      <div class="runner-card" data-type="${esc(coreType)}" data-card-mode="${complete ? "live" : "identity"}">
+        <div class="runner-type stencil" data-fit-title="${typeTitleSize()}" data-fit-uniform>${esc(p.name)}</div>
+        <div class="modifier-chip">${esc(mod.name)}</div>
+        <div class="runner-copy">${esc(p.tagline)}</div>
+        <div class="runner-editorial">
+          ${runnerSvg()}
+          ${shoeSvg()}
+        </div>
+        <div class="focus-line">지금 초점 · ${esc(p.focus)}</div>
+        <div class="metric-grid">${complete ? activityGrid : identityGrid}</div>
+        <div class="card-status">
+          <span>${complete ? "러닝 정보까지 반영" : "5개 답변 기준 · 잠정"}</span>
+          <span class="card-mark">GEARMATCH<span>.AI</span></span>
+        </div>
+        <div class="runner-card-bottom"></div>
+      </div>`;
+  }
+
+  function cardOwnershipHTML(complete){
+    return `
+      <div class="card-ownership">
+        <p class="ownership-line">${complete
+          ? "확정된 카드예요. 저장하거나 친구에게 보여줄 수 있어요."
+          : "지금 이대로 저장해도 되고, 정보를 더해 확정한 뒤 저장해도 돼요."}</p>
+        <div class="card-ownership-row" role="group" aria-label="러너 카드 저장과 공유">
+          <button class="card-tool-btn" data-action="saveRunnerCard">카드 저장</button>
+          <button class="card-tool-btn" data-action="shareRunnerCard">공유하기</button>
+        </div>
+      </div>`;
+  }
+
+  function renderCard(complete){
+    const t = D.types[typeKey()];
+    app.innerHTML = `
+      <section class="screen result-wrap">
+        ${topbar(complete ? "cardCompleteBack" : null)}
+        ${typeCardHTML(complete)}
+
+        ${complete && state.typeShift ? `
+          <div class="type-shift">
+            <div class="shift-label">타입이 바뀌었어요</div>
+            <strong>러닝 정보를 더하니 ${esc(D.types[state.typeShift.coreType].name)}에서 ${esc(D.types[typeKey()].name)}로 바뀌었어요.</strong>
+            <span>경력·횟수·주간 러닝량이 판정에 함께 들어갔어요.</span>
+          </div>` : ""}
+
+        ${complete ? "" : `
+          <p class="identity-caption">${esc(t.copy)}</p>
+          ${typeEvidenceHTML()}
+        `}
+
+        ${cardOwnershipHTML(complete)}
+
+        ${complete ? `
+          <div class="card-loop">
+            <h3 class="loop-title">이제 장비를 골라볼까요?</h3>
+            <p class="loop-copy">지금까지 답한 러닝 정보와 지금 신는 신발을 근거로, 순위 없는 세 가지 방향을 보여드릴게요.</p>
+            ${state.activity.lastRunKm ? `
+              <div class="run-update">
+                <div class="micro">카드에 반영됨</div>
+                <strong>+${fmtKm(state.activity.lastRunKm)} · 이번 주 ${fmtKm(state.activity.weeklyKm)}${state.activity.lastRunShoe ? ` · ${esc(state.activity.lastRunShoe)}` : ""}</strong>
+              </div>` : ""}
+            <div class="actions">
+              <button class="btn" data-action="toGearNeed">장비 추천 받기</button>
+              <button class="loop-btn" data-action="openRunEntry">
+                <span>
+                  <strong>오늘 뛴 러닝 더하기</strong>
+                  <small>거리와 신발을 남기면 카드가 더 구체적이 돼요</small>
+                </span>
+                <span class="plus"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="3" stroke-linecap="square"/></svg></span>
+              </button>
+            </div>
+          </div>
+        ` : `
+          <p class="identity-caption dim">지금은 <strong>5개 답변만으로 본 결과</strong>예요. 러닝 경력·횟수·주간 거리를 더하면 같은 기준으로 다시 판정해요.</p>
+          <div class="actions">
+            <button class="btn" data-action="toProfile">내 러닝 정보 더하기</button>
+            <p class="action-note">선택사항 · 3가지만 더하면 타입이 확정돼요</p>
+            <button class="btn secondary" data-action="toGearNeed">건너뛰고 장비 추천 보기</button>
+          </div>
+        `}
+      </section>`;
+  }
+
+  function renderRunEntry(){
+    ensureActivityBase();
+    const currentShoe = state.profile.shoe || null;
+    const distance = state.runEntry.distance || "";
+    const km = Number(distance);
+    const validDistance = Number.isFinite(km) && km > 0 && km <= 100;
+    const shoeChoice = state.runEntry.shoe;
+    const ready = validDistance && !!shoeChoice;
+
+    app.innerHTML = `
+      <section class="screen run-entry-wrap">
+        ${topbar("runEntryBack")}
+        <div class="run-entry-hero">
+          <h2>오늘의 러닝을<br>카드에 더해보세요.</h2>
+          <p class="body">거리와 신은 신발만 남기면 카드에 바로 반영돼요.</p>
+          <div class="run-entry-summary">
+            <div class="run-entry-stat"><span>이번 주</span><strong>${esc(fmtKm(state.activity.weeklyKm) || "—")}</strong></div>
+            <div class="run-entry-stat"><span>러닝 횟수</span><strong>${state.activity.runs!==null ? `${state.activity.runs}회` : "—"}</strong></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="field-title">얼마나 달렸나요?</div>
+          <label class="distance-field">
+            <input id="runDistance" type="number" inputmode="decimal" min="0.1" max="100" step="0.1" value="${esc(distance)}" placeholder="0.0" aria-label="러닝 거리" />
+            <span class="distance-unit">KM</span>
+          </label>
+
+          <div class="field-title">어떤 신발로 뛰었나요?</div>
+          <div class="run-shoe-list" role="radiogroup" aria-label="어떤 신발로 뛰었나요?">
+            ${currentShoe ? `
+              <button type="button" role="radio" aria-checked="${shoeChoice===currentShoe}" class="run-shoe-option ${shoeChoice===currentShoe?"selected":""}" data-run-shoe="${esc(currentShoe)}">
+                <span class="run-shoe-copy"><strong>${esc(currentShoe)}</strong><small>지금 등록된 신발 · 이 신발의 누적 거리도 같이 쌓여요</small></span>
+                <span class="shoe-dot"></span>
+              </button>` : ""}
+            <button type="button" role="radio" aria-checked="${shoeChoice==="UNTRACKED"}" class="run-shoe-option ${shoeChoice==="UNTRACKED"?"selected":""}" data-run-shoe="UNTRACKED">
+              <span class="run-shoe-copy"><strong>${currentShoe ? "다른 신발로 달렸어요" : "신발은 기록하지 않을게요"}</strong><small>${currentShoe ? "이번 거리는 카드에만 반영하고, 등록된 신발의 누적 거리에는 더하지 않아요." : "거리는 카드에 반영되지만 신발 누적 거리는 쌓이지 않아요."}</small></span>
+              <span class="shoe-dot"></span>
+            </button>
+          </div>
+          <div class="run-entry-note">저장하면 이번 주 거리와 러닝 횟수가 바로 올라가요. 지금 등록된 신발을 골랐을 때만 그 신발의 누적 거리도 함께 늘어나요.</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" data-action="saveRunEntry" ${ready?"":"disabled"}>RUN 저장하기</button>
+        </div>
+      </section>`;
+  }
+
+  function renderProfile(){
+    if(state.profileStep===1){
+      // 선택지 구간은 TYPE_RULE_v0.1이 읽는 밴드와 1:1로 맞춘다 (INPUT_MAP_v0.1)
+      const exp = ["3개월 미만","3개월~1년","1~3년","3년 이상"];
+      const runs = ["주 1회 이하","주 1~2회","주 3~4회","주 5회 이상"];
+      const weekly = ["5km 미만","5~15km","15~30km","30km 이상","잘 모르겠어요"];
+      const ready = state.profile.experience && state.profile.runs && state.profile.weekly;
+      app.innerHTML = `
+        <section class="screen">
+          ${topbar("profileBack")}
+          ${progressHTML(1,2,"내 러닝 정보")}
+          <h2>내 러닝을 카드에<br>더해볼까요?</h2>
+          <p class="body">실제 러닝 정보가 들어가면 카드도 장비 추천도 조금 더 구체적이 돼요.</p>
+
+          <div class="form-section">
+            <div class="field-title">러닝을 시작한 지 얼마나 됐나요?</div>
+            ${compactButtons(exp,state.profile.experience,"profile-exp")}
+            <div class="field-title">보통 일주일에 몇 번 달리나요?</div>
+            ${compactButtons(runs,state.profile.runs,"profile-runs")}
+            <div class="field-title">보통 한 주에 얼마나 달리나요?</div>
+            ${compactButtons(weekly,state.profile.weekly,"profile-weekly")}
+          </div>
+
+          <div class="actions"><button class="btn" data-action="profileNext" ${ready?"":"disabled"}>다음</button></div>
+        </section>`;
+      return;
+    }
+
+    const shoeReady = !!state.profile.shoe || !!state.profile.shoeStatus;
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("profileStepBack")}
+        ${progressHTML(2,2,"내 러닝 정보")}
+        <h2>지금 가장 자주 신는<br>러닝화는?</h2>
+        <p class="body">지금 신는 신발을 알면, 다음 추천에서 무엇을 남기고 무엇을 바꿀지 같이 볼 수 있어요.</p>
+
+        <label class="searchbox">
+          <span class="line-label">제품명으로 찾기</span>
+          <input id="shoeSearch" value="${esc(state.shoeQuery)}" placeholder="예: Pegasus" autocomplete="off" />
+        </label>
+        <div id="shoeOptions" class="shoe-list" role="radiogroup" aria-label="지금 가장 자주 신는 러닝화">
+          ${D.shoes.map(v=>`<button type="button" role="radio" aria-checked="${state.profile.shoe===v}" class="shoe-row ${state.profile.shoe===v?"selected":""}" data-shoe="${esc(v)}">
+            <span>${esc(v)}</span><span class="shoe-dot"></span>
+          </button>`).join("")}
+        </div>
+
+        <!-- 목록에 없는 신발이 훨씬 많다. 검색이 막다른 길이 되면 안 된다. -->
+        <div id="shoeEmpty" class="shoe-empty" ${state.shoeQuery?"":"hidden"}>
+          등록된 5종에는 없는 제품이에요. 프로토타입에는 일부만 올려두었고,
+          아래 버튼으로 적은 이름을 그대로 쓸 수 있어요.
+        </div>
+        <button type="button" id="shoeCustom" class="shoe-row custom" data-action="useCustomShoe" ${state.shoeQuery?"":"hidden"}>
+          <span><strong class="shoe-custom-name">${esc(state.shoeQuery)}</strong><small>적은 이름으로 등록</small></span>
+          <span class="shoe-dot"></span>
+        </button>
+
+        <div class="shoe-fallbacks" role="group" aria-label="목록에서 고르기 어려울 때">
+          <button type="button" class="chip-row ${state.profile.shoeStatus==="unknown"?"selected":""}" data-shoe-status="unknown">잘 모르겠어요</button>
+          <button type="button" class="chip-row ${state.profile.shoeStatus==="none"?"selected":""}" data-shoe-status="none">러닝화가 아직 없어요</button>
+        </div>
+
+        <div class="actions"><button class="btn" data-action="profileComplete" ${shoeReady?"":"disabled"}>카드에 반영하기</button></div>
+      </section>`;
+  }
+
+  function renderGearNeed(){
+    const options = [
+      ["LONG","편하게 오래 달릴 신발"],
+      ["SPEED","기록을 노릴 신발"],
+      ["REPLACE","지금 신발을 바꿀 신발"],
+      ["RACE","대회에서 신을 신발"],
+      ["UNKNOWN","아직 잘 모르겠어요"]
+    ];
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("gearBack")}
+        ${progressHTML(1,2,"장비 방향 찾기")}
+        <h2>어떤 장비가<br>궁금한가요?</h2>
+        <p class="body">먼저 가장 가까운 목적을 골라보세요.<br>카드에서 이미 알려준 건 다시 묻지 않아요.</p>
+
+        <div class="stack section-gap">
+          ${options.map(([v,t])=>`<button data-gear-need="${v}" class="option ${state.gearNeed===v?"selected":""}">${t}</button>`).join("")}
+        </div>
+
+        <div class="gear-entry">
+          <div class="gear-entry-title">원하는 걸 직접 말해도 돼요</div>
+          <div class="small">선택지로 애매하다면 평소 말하듯 적어주세요. 적은 내용을 추천 조건으로 정리해 드려요.</div>
+          <div class="askbox">
+            <input id="gearQuery" value="${esc(state.freeGearQuery)}" placeholder="페가수스보다 조금 더 편한 신발 있어?" autocomplete="off" />
+            <button class="ask-send" data-action="askGearCoach">질문</button>
+          </div>
+          <div class="prompt-examples">예: 10km 기록 줄이고 싶어 · 하프 대회용이 필요해</div>
+        </div>
+
+        <div class="actions"><button class="btn" data-action="gearNeedNext" ${state.gearNeed?"":"disabled"}>선택해서 계속</button></div>
+      </section>`;
+  }
+
+  function renderGearPriority(){
+    const opts = ["편안함","가벼움","반발감","안정감","잘 모르겠어요"];
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("priorityBack")}
+        ${progressHTML(2,2,"장비 방향 찾기")}
+        <h2>이번 선택에서<br>제일 놓치고 싶지 않은 건?</h2>
+        <p class="body">같은 목적이라도 이 답에 따라 비교 방향이 달라져요.</p>
+        <div class="stack section-gap">
+          ${opts.map(v=>`<button ${selectButton(v,state.gearPriority,"gear-priority")}>${v}</button>`).join("")}
+        </div>
+        <div class="actions"><button class="btn" data-action="priorityNext" ${state.gearPriority?"":"disabled"}>추천 방향 보기</button></div>
+      </section>`;
+  }
+
+  function renderNeedFollowup(){
+    const hasShoe = !!state.profile.shoe;
+    const options = hasShoe ? [
+      ["LONG","더 편했으면 좋겠다"],
+      ["SPEED","더 빠른 느낌이면 좋겠다"],
+      ["REPLACE","비슷한 역할로 새 신발을 찾고 싶다"],
+      ["RACE","대회를 준비하고 있다"],
+      ["REPLACE","딱히 불편한 건 없다"]
+    ] : [
+      ["LONG","편하게 오래 달리기"],
+      ["SPEED","조금 더 빠르게 달리기"],
+      ["REPLACE","다양한 러닝에 무난하게 쓰기"],
+      ["RACE","대회 준비"]
+    ];
+
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("needFollowupBack")}
+        <h2>${hasShoe ? "괜찮아요. 지금 신는 신발에서 한 가지만 골라주세요." : "러닝할 때 가장 원하는 느낌은 무엇인가요?"}</h2>
+        ${hasShoe ? `<p class="body">어떤 부분이 달라졌으면 좋겠나요?</p>`:""}
+        <div class="stack section-gap">
+          ${options.map(([v,t],i)=>`<button class="option ${state.needFollowup===i?"selected":""}" data-need-followup="${i}" data-scenario="${v}">${t}</button>`).join("")}
+        </div>
+        <div class="actions"><button class="btn" data-action="needFollowupNext" ${state.needFollowup===null?"disabled":""}>계속</button></div>
+      </section>`;
+  }
+
+  function classifyFreeQuery(text){
+    const q = String(text || "").toLowerCase();
+    let scenario = "UNKNOWN";
+    let priority = null;
+
+    if(/대회|레이스|마라톤|하프|풀코스|10k|10km/.test(q)) scenario = "RACE";
+    else if(/빠르|기록|페이스|스피드|템포|반발/.test(q)) scenario = "SPEED";
+    else if(/오래|장거리|편하|쿠션|회복/.test(q)) scenario = "LONG";
+    else if(/바꾸|교체|대체|지금 신발|페가수스|노바블라스트|현재 신발/.test(q)) scenario = "REPLACE";
+
+    if(/편하|쿠션|부드/.test(q)) priority = "편안함";
+    else if(/가볍|무게/.test(q)) priority = "가벼움";
+    else if(/반발|빠르|기록|페이스/.test(q)) priority = "반발감";
+    else if(/안정|흔들|지지/.test(q)) priority = "안정감";
+
+    return {scenario, priority};
+  }
+
+  function applyFreeQuery(){
+    const query = state.freeGearQuery.trim();
+    if(!query) return false;
+    const parsed = classifyFreeQuery(query);
+    state.gearNeed = parsed.scenario;
+    state.scenario = parsed.scenario;
+    if(parsed.priority) state.gearPriority = parsed.priority;
+
+    if(parsed.scenario === "UNKNOWN"){
+      state.gearNeed = "UNKNOWN";
+      state.screen = "needFollowup";
+      return true;
+    }
+    if(!parsed.priority){
+      state.screen = "gearPriority";
+      return true;
+    }
+    routeToRecommendation();
+    return true;
+  }
+
+  function needLabel(){
+    const map = {
+      LONG:"편하게 오래 달릴 신발",
+      SPEED:"기록을 노릴 신발",
+      REPLACE:"지금 신발을 대체할 신발",
+      RACE:"대회에서 신을 신발"
+    };
+    return map[state.scenario] || map[state.gearNeed] || "장비 추천";
+  }
+
+  function recommendationNeedsFollowup(){
+    // 테스트에서 관심 거리를 이미 받았다면 다시 묻지 않는다.
+    if(!state.raceDistance && ["10K","HALF","FULL"].includes(state.interestDistance)){
+      state.raceDistance = state.interestDistance;
+    }
+    if(state.scenario==="RACE" && !state.raceDistance) return "race";
+    if(!state.profile.weekly && !state.coachFollowup) return "weekly";
+    return null;
+  }
+
+  function routeToRecommendation(){
+    if(recommendationNeedsFollowup()){
+      state.screen="coach";
+      return;
+    }
+    state.screen="recommendation";
+  }
+
+  function renderCoach(){
+    const missing = recommendationNeedsFollowup();
+    if(!missing){
+      state.screen="recommendation";
+      render();
+      return;
+    }
+
+    const isRace = missing==="race";
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("coachBack")}
+        <h2>${isRace ? "어떤 거리를<br>준비하고 있나요?" : "평소 한 주에<br>얼마나 달리나요?"}</h2>
+        <p class="body">추천 방향을 나누는 데 필요한 한 가지만 더 여쭤볼게요.</p>
+
+        <div class="form-section" style="padding-top:16px">
+          ${renderCoachFollowup(isRace)}
+        </div>
+
+        <div class="actions">
+          <button class="btn" data-action="toRecommendation" ${
+            isRace ? (state.raceDistance?"":"disabled") : (state.coachFollowup?"":"disabled")
+          }>추천 방향 보기</button>
+        </div>
+      </section>`;
+  }
+
+  function renderCoachFollowup(isRace){
+    if(isRace){
+      const opts=["10K","HALF","FULL"];
+      return `
+        <div class="compact-grid">
+          ${opts.map(v=>`<button class="compact-option ${state.raceDistance===v?"selected":""}" data-race-distance="${v}">${v}</button>`).join("")}
+        </div>`;
+    }
+    const opts=["5km 미만","5~15km","15~30km","30km 이상","잘 모르겠어요"];
+    return `
+      <div class="compact-grid">
+        ${opts.map(v=>`<button class="compact-option ${state.coachFollowup===v?"selected":""}" data-coach-weekly="${v}">${v}</button>`).join("")}
+      </div>`;
+  }
+
+  /* D-01 — Runner Type은 Identity Layer다. 추천 점수에 들어가지 않으므로
+     "이 추천에 쓴 정보"에도 넣지 않는다. 여기 칩으로 세워두면 화면이
+     제품 원칙을 정면으로 뒤집는다. */
+  function contextChips(){
+    return [
+      state.profile.weekly || state.coachFollowup || null,
+      state.profile.shoe ? `지금 신는 신발 · ${state.profile.shoe}` : null,
+      state.raceDistance ? `${state.raceDistance} 준비` : null,
+      state.gearPriority && state.gearPriority!=="잘 모르겠어요" ? `${state.gearPriority} 우선` : null
+    ].filter(Boolean);
+  }
+
+  function recommendationSummary(){
+    const current = state.profile.shoe;
+    const priority = state.gearPriority && state.gearPriority!=="잘 모르겠어요" ? state.gearPriority : null;
+    const distance = state.raceDistance ? ` ${state.raceDistance} 기준으로` : "";
+    if(current && priority){
+      return `${current}${josa(current,"을","를")} 기준으로${distance} ${needLabel()}${josa(needLabel(),"을","를")} 찾고 있고, 이번 선택에서는 ${priority}${josa(priority,"을","를")} 가장 중요하게 보고 있어요.`;
+    }
+    if(current){
+      return `${current}${josa(current,"을","를")} 기준으로${distance} ${needLabel()}의 세 가지 방향을 비교해볼게요.`;
+    }
+    if(priority){
+      return `${distance.trim()} ${needLabel()}${josa(needLabel(),"을","를")} 찾고 있고, 이번 선택에서는 ${priority}${josa(priority,"을","를")} 가장 중요하게 보고 있어요.`.trim();
+    }
+    return `${distance.trim()} ${needLabel()}의 세 가지 방향을 비교해보세요.`.trim();
+  }
+
+  function gearRole(i){
+    const roles = {
+      LONG:["편안함 우선","데일리 균형","더 멀리"],
+      SPEED:["가볍고 빠르게","훈련까지 함께","플레이트 추진"],
+      REPLACE:["익숙한 느낌","더 안정적으로","러닝감 변화"],
+      RACE:["레이스 전용","최대 퍼포먼스","레이스 + 훈련"]
+    };
+    return roles[state.scenario]?.[i] || D.scenarios[state.scenario]?.candidates?.[i]?.micro || `DIRECTION ${i+1}`;
+  }
+
+  function productAssetSlug(c){
+    return `${c.brand}-${c.product}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,"-")
+      .replace(/^-+|-+$/g,"");
+  }
+
+  /* 제품 이미지는 아직 하나도 없다(seed의 officialImageUrl이 Eligible 29개 전부 null).
+     회색 실루엣을 깔면 카드마다 깨진 이미지 자리가 생기고(board-3 on board-2 = 1.22:1),
+     빈 경로로 <img>를 걸면 렌더마다 404가 쌓인다. 그래서 매니페스트에 있는 것만 그린다 —
+     아래 맵에 slug를 추가하면 코드 변경 없이 이미지가 나타난다. */
+  window.GM_PRODUCT_IMAGES = window.GM_PRODUCT_IMAGES || {};
+
+  function productVisual(c){
+    const slug = productAssetSlug(c);
+    const src = window.GM_PRODUCT_IMAGES[slug];
+    if(!src) return "";
+    return `
+      <div class="product-visual" data-product="${esc(c.product)}" data-brand="${esc(c.brand)}">
+        <div class="product-media" data-asset-slot="product-image">
+          <img src="${esc(src)}" alt="${esc(c.brand)} ${esc(c.product)}"
+            onerror="this.closest('.product-visual').remove()" />
+        </div>
+      </div>`;
+  }
+
+  /* 세 레인을 나란히. 차이를 먼저 보여주는 것이 이 블록의 일이므로
+     방향이 주인공이고 제품명은 아래 카드로 이어주는 실마리다.
+     micro 라벨은 카드에서 다시 나오므로 여기서는 빼고 폭을 벌어준다. */
+  function renderGearOverview(s){
+    return `
+      <section class="gear-overview">
+        <h3 class="overview-title">세 후보의 차이부터.</h3>
+        <p class="overview-note">순위가 아니라 서로 다른 선택 방향이에요.</p>
+        <div class="overview-grid">
+          ${s.candidates.map((c,i)=>`
+            <article class="overview-item">
+              <div class="overview-role">${esc(gearRole(i))}</div>
+              <div class="overview-product">${esc(c.product)}</div>
+            </article>`).join("")}
+        </div>
+      </section>`;
+  }
+
+  function renderRecommendation(){
+    const s = D.scenarios[state.scenario];
+    const current = state.profile.shoe;
+    app.innerHTML = `
+      <section class="screen">
+        ${topbar("recommendationBack")}
+        <h2>${esc(s.headline)}</h2>
+
+        <section class="recommendation-context">
+          <p class="context-summary">${esc(recommendationSummary())}</p>
+          <div class="context-strip">${contextChips().map(c=>`<span class="context-chip">${esc(c)}</span>`).join("")}</div>
+          <div class="context-foot">
+            <span class="context-note">러너 타입은 추천 점수에 넣지 않아요. 위 정보만 썼어요.</span>
+            <button class="context-edit" data-action="editRecommendationCriteria">조건 다시 고르기</button>
+          </div>
+        </section>
+
+        ${renderGearOverview(s)}
+
+        <div class="direction-list">
+          ${s.candidates.map((c,i)=>renderCandidate(c,i,current)).join("")}
+        </div>
+
+        ${renderCompareCoach()}
+
+        <div class="notice">지금은 시나리오별로 후보를 고정해 둔 프로토타입이에요. 비슷한 러너 집계는 응답이 쌓이면 각 후보 안에 들어갑니다 — 없는 표본을 지어내지 않으려고 지금은 비워 두었어요.</div>
+        <button class="btn secondary" data-action="restart">처음부터 다시 보기</button>
+      </section>`;
+  }
+
+  /* 전환 행동(저장·가격·구매처)은 접힌 서랍이 아니라 카드 본문에 둔다.
+     제품의 성공 조건이 두 탭 깊이에 묻혀 있으면 안 된다. */
+  function renderCandidate(c,i,current){
+    const currentText = current ? c.current : null;
+    return `
+      <article class="choice-card">
+        <div class="direction-word">${esc(gearRole(i))}</div>
+
+        <div class="product-brand">${esc(c.brand)}</div>
+        <h3 class="product-name">${esc(c.product)}</h3>
+        <div class="product-micro micro">${esc(c.micro)}</div>
+        ${productVisual(c)}
+
+        <div class="primary-reasons">
+          <div class="reason-block">
+            <div class="reason-label">왜 이 후보인가</div>
+            <p class="reason-copy">${esc(c.short)}</p>
+          </div>
+          ${currentText ? `
+          <div class="reason-block">
+            <div class="reason-label">무엇이 달라지나</div>
+            <p class="reason-copy">${esc(currentText)}</p>
+          </div>`:""}
+          <div class="reason-block watch">
+            <div class="reason-label">확인할 점</div>
+            <p class="reason-copy">${esc(c.caution)}</p>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="mini-btn" data-product-action="저장">저장</button>
+          <button class="mini-btn" data-product-action="가격 확인">가격 확인</button>
+          <button class="mini-btn primary" data-product-action="구매처 확인">구매처 확인</button>
+        </div>
+      </article>`;
+  }
+
+  /* 짧게 세 개. 길고 많으면 후보를 보기도 전에 화면 한 판을 잡아먹는다. */
+  function comparePrompts(){
+    const map = {
+      LONG:["편안함을 제일 보면?","지금 신발과 뭐가 달라?"],
+      SPEED:["훈련까지 같이 쓰려면?","지금 신발과 뭐가 달라?"],
+      REPLACE:["지금 신발과 제일 비슷한 건?","안정감을 우선하면?"],
+      RACE:["레이스 전용은 어느 쪽?","훈련에도 같이 쓰려면?"]
+    };
+    return [...(map[state.scenario]||[]),"하나만 고른다면?"];
+  }
+
+  function renderCompareCoach(){
+    const prompts = comparePrompts();
+    return `
+      <section class="compare-coach" id="compareCoach">
+        <h3>셋 중 아직 고민된다면.</h3>
+        <p class="small">추천 이유를 다시 읽기보다, 지금 결정에 필요한 걸 바로 물어보세요.</p>
+        <div class="quick-prompts">
+          ${prompts.map(p=>`<button class="quick-prompt" data-compare-prompt="${esc(p)}">${esc(p)}</button>`).join("")}
+        </div>
+        <div class="askbox">
+          <input id="compareQuery" value="${esc(state.compareQuestion)}" placeholder="예: 지금 신발과 제일 차이 큰 건?" aria-label="세 후보에 대해 궁금한 점" autocomplete="off" />
+          <button class="ask-send" data-action="askCompareCoach">보내기</button>
+        </div>
+        ${state.compareAnswer ? `
+          <div class="coach-answer" id="coachAnswer">
+            <div class="answer-lead">${esc(state.compareAnswer.lead)}</div>
+            <p class="answer-body">${esc(state.compareAnswer.body)}</p>
+          </div>` : ""}
+      </section>`;
+  }
+
+  function buildCompareAnswer(q){
+    const s=D.scenarios[state.scenario];
+    const c=s.candidates;
+    const text=String(q||"").toLowerCase();
+
+    if(/차이|쉽게|정리|비교/.test(text)){
+      return {
+        lead:`핵심은 “${c[0].direction.replace("다면","") } / ${c[1].direction.replace("다면","")} / ${c[2].direction.replace("다면","")}”의 차이예요.`,
+        body:`${c[0].product}은 ${c[0].micro.toLowerCase()} 방향, ${c[1].product}은 ${c[1].micro.toLowerCase()} 방향, ${c[2].product}은 ${c[2].micro.toLowerCase()} 방향으로 보면 됩니다. 하나가 무조건 더 좋은 순위는 아니에요.`
+      };
+    }
+    if(/안정/.test(text)){
+      const pick= state.scenario==="REPLACE" ? c[1] : c.find(x=>/STABLE|COMFORT/.test(x.micro)) || c[0];
+      return {lead:`안정감을 먼저 본다면 ${pick.product} 쪽을 먼저 비교해보세요.`,body:`${pick.short} 다만 실제 안정감과 핏은 발 형태와 착화감에 영향을 받기 때문에 구매 전 시착은 필요합니다.`};
+    }
+    if(/편안|장거리|오래/.test(text)){
+      const pick= state.scenario==="LONG" ? c[0] : c.find(x=>/COMFORT|LONG/.test(x.micro)) || c[0];
+      return {lead:`편안함과 장거리가 우선이면 ${pick.product} 방향이 가장 명확해요.`,body:`${pick.current} 다른 후보는 활용 범위나 빠른 느낌을 더 가져가는 선택이라 우선순위가 달라집니다.`};
+    }
+    if(/기록|빠르|레이스|대회|전용/.test(text)){
+      const pick= state.scenario==="RACE" ? c[1] : state.scenario==="SPEED" ? c[0] : c[2];
+      return {lead:`퍼포먼스 변화를 크게 보고 싶다면 ${pick.product}을 먼저 보세요.`,body:`${pick.current} 다만 데일리 활용까지 필요한지에 따라 다른 후보가 더 합리적일 수 있습니다.`};
+    }
+    if(/비슷|현재|지금 신발/.test(text)){
+      const pick= state.scenario==="REPLACE" ? c[0] : c[1];
+      return {lead:`현재 신발의 역할을 크게 바꾸고 싶지 않다면 ${pick.product}부터 보는 편이 자연스러워요.`,body:`${pick.current} 반대로 러닝감의 변화를 크게 원한다면 다른 Direction이 더 맞을 수 있습니다.`};
+    }
+    if(/훈련|같이|활용/.test(text)){
+      const pick= state.scenario==="RACE" ? c[2] : c[1];
+      return {lead:`훈련 활용까지 남기고 싶다면 ${pick.product} 방향이 더 균형적이에요.`,body:`${pick.short} 레이스 전용성이나 한 가지 성능을 극대화하는 후보와는 목적이 다릅니다.`};
+    }
+
+    return {
+      lead:`지금 질문이라면 ${c[0].product}과 ${c[1].product} 두 방향부터 비교해보는 게 좋아요.`,
+      body:`${c[0].product}은 “${c[0].direction}”, ${c[1].product}은 “${c[1].direction}”에 가깝습니다. 무엇을 더 중요하게 보는지 한 가지를 더 말해주면 후보를 더 좁혀볼 수 있어요.`
+    };
+  }
+
+  function resetState(){
+    state.screen="landing";
+    state.questionIndex=0;
+    state.answers=[null,null,null,null,null];
+    state.interestDistance=null;
+    state.typeResult=null;
+    state.typeStage=null;
+    state.typeShift=null;
+    state.profile={experience:null,runs:null,weekly:null,shoe:null,shoeStatus:null};
+    state.profileStep=1;
+    state.shoeQuery="";
+    state.gearNeed=null;
+    state.freeGearQuery="";
+    state.gearPriority=null;
+    state.scenario=null;
+    state.needFollowup=null;
+    state.coachFollowup=null;
+    state.raceDistance=null;
+    state.compareQuestion="";
+    state.compareAnswer=null;
+    state.activity={weeklyKm:null,runs:null,shoeMileage:null,lastRunKm:null,lastRunShoe:null};
+    state.runEntry={distance:"",shoe:null};
+  }
+
+  app.addEventListener("click", e=>{
+    const action = e.target.closest("[data-action]")?.dataset.action;
+    const compareBtn = e.target.closest("[data-compare-prompt]");
+    if(compareBtn){
+      state.compareQuestion = compareBtn.dataset.comparePrompt;
+      state.compareAnswer = buildCompareAnswer(state.compareQuestion);
+      pendingReveal = "#coachAnswer";   // 답이 화면 밖에 그려지지 않게 한다
+      render(); return;
+    }
+
+    if(e.target.matches("[data-option-index]")){
+      state.answers[state.questionIndex] = Number(e.target.dataset.optionIndex);
+      scheduleAdvance();
+      render(); return;
+    }
+    if(e.target.matches("[data-interest-distance]")){
+      state.interestDistance = e.target.dataset.interestDistance;
+      cancelAdvance();
+      advanceTimer = setTimeout(()=>{ advanceTimer=null; goToResult(); render(); }, 280);
+      render(); return;
+    }
+    if(e.target.matches("[data-profile-exp]")){
+      state.profile.experience=e.target.dataset.profileExp; render(); return;
+    }
+    if(e.target.matches("[data-profile-runs]")){
+      state.profile.runs=e.target.dataset.profileRuns; render(); return;
+    }
+    if(e.target.matches("[data-profile-weekly]")){
+      state.profile.weekly=e.target.dataset.profileWeekly; render(); return;
+    }
+    if(e.target.matches("[data-shoe]")){
+      state.profile.shoe=e.target.dataset.shoe; state.profile.shoeStatus=null; render(); return;
+    }
+    if(e.target.matches("[data-shoe-status]")){
+      state.profile.shoe=null; state.profile.shoeStatus=e.target.dataset.shoeStatus; render(); return;
+    }
+    const runShoeBtn = e.target.closest("[data-run-shoe]");
+    if(runShoeBtn){
+      state.runEntry.shoe=runShoeBtn.dataset.runShoe; render(); return;
+    }
+    if(e.target.matches("[data-gear-need]")){
+      state.gearNeed=e.target.dataset.gearNeed; render(); return;
+    }
+    if(e.target.matches("[data-gear-priority]")){
+      state.gearPriority=e.target.dataset.gearPriority; render(); return;
+    }
+    if(e.target.matches("[data-need-followup]")){
+      state.needFollowup=Number(e.target.dataset.needFollowup);
+      state.scenario=e.target.dataset.scenario;
+      render(); return;
+    }
+    if(e.target.matches("[data-race-distance]")){
+      state.raceDistance=e.target.dataset.raceDistance; render(); return;
+    }
+    if(e.target.matches("[data-coach-weekly]")){
+      state.coachFollowup=e.target.dataset.coachWeekly; render(); return;
+    }
+    if(e.target.matches("[data-product-action]")){
+      showToast(`${e.target.dataset.productAction}은 MVP에서 연결돼요. 지금은 자리만 확인합니다.`);
+      return;
+    }
+
+    if(!action) return;
+
+    const actions = {
+      startTest(){ state.screen="question"; state.questionIndex=0; },
+      openReturningLogin(){ state.screen="returningLogin"; },
+      returningBack(){ state.screen="landing"; },
+      loadExistingRunner(){
+        if(!state.returningNickname.trim() || !/^\d{4}$/.test(state.returningPin)) return;
+        // 저장 기능이 범위 밖이라 이전 답변을 재현해 같은 규칙으로 다시 판정한다.
+        state.answers=[3,3,3,3,3];
+        state.interestDistance="10K";
+        state.profile={experience:"1~3년",runs:"주 3~4회",weekly:"15~30km",shoe:"Nike Pegasus 42",shoeStatus:"known"};
+        state.activity={weeklyKm:null,runs:null,shoeMileage:null,lastRunKm:null,lastRunShoe:null};
+        evaluateType("confirmed");
+        state.typeShift=null;
+        state.runEntry={distance:"",shoe:"Nike Pegasus 42"};
+        state.gearNeed=null;
+        state.gearPriority=null;
+        state.scenario=null;
+        state.needFollowup=null;
+        state.coachFollowup=null;
+        state.raceDistance=null;
+        state.compareQuestion="";
+        state.compareAnswer=null;
+        state.screen="cardComplete";
+        showToast(`${state.returningNickname.trim()}님의 Runner Card를 불러왔습니다.`);
+      },
+      questionBack(){
+        cancelAdvance();
+        if(state.questionIndex>0) state.questionIndex--;
+        else state.screen="landing";
+      },
+      distanceCheckBack(){
+        cancelAdvance();
+        state.screen="question"; state.questionIndex=4; state.interestDistance=null;
+      },
+      toProfile(){ state.profileStep=1; state.screen="profile"; },
+      useCustomShoe(){
+        const name=state.shoeQuery.trim();
+        if(!name) return;
+        state.profile.shoe=name;
+        state.profile.shoeStatus=null;
+        showToast(`${name}${josa(name,"을","를")} 지금 신는 신발로 등록했어요.`);
+      },
+      profileBack(){ state.screen="cardLite"; },
+      profileNext(){ state.profileStep=2; render(); return; },
+      profileStepBack(){ state.profileStep=1; render(); return; },
+      profileComplete(){ ensureActivityBase(); evaluateType("confirmed"); state.screen="cardComplete"; },
+      cardCompleteBack(){ state.profileStep=2; state.screen="profile"; },
+      toGearNeed(){ state.screen="gearNeed"; },
+      openRunEntry(){
+        ensureActivityBase();
+        state.runEntry={distance:"",shoe:state.profile.shoe || "UNTRACKED"};
+        state.screen="runEntry";
+      },
+      runEntryBack(){ state.screen="cardComplete"; },
+      saveRunEntry(){
+        ensureActivityBase();
+        const km=Number(state.runEntry.distance);
+        if(!Number.isFinite(km) || km<=0 || km>100 || !state.runEntry.shoe) return;
+        state.activity.weeklyKm=(state.activity.weeklyKm ?? 0)+km;
+        state.activity.runs=(state.activity.runs ?? 0)+1;
+        const trackedShoe=state.runEntry.shoe===state.profile.shoe && !!state.profile.shoe;
+        if(trackedShoe) state.activity.shoeMileage=(state.activity.shoeMileage ?? 0)+km;
+        state.activity.lastRunKm=km;
+        state.activity.lastRunShoe=trackedShoe ? state.profile.shoe : "OTHER GEAR";
+        state.screen="cardComplete";
+        showToast(`${fmtKm(km)} 러닝이 카드에 반영됐어요.`);
+      },
+      gearBack(){ state.screen = (state.profile.experience || state.profile.weekly || state.profile.shoe || state.profile.shoeStatus) ? "cardComplete" : "cardLite"; },
+      gearNeedNext(){ state.screen="gearPriority"; },
+      askGearCoach(){
+        const input=document.getElementById("gearQuery");
+        if(input) state.freeGearQuery=input.value;
+        if(!applyFreeQuery()) showToast("궁금한 내용을 한 줄로 적어주세요.");
+        else showToast("적어주신 내용을 추천 조건으로 정리했어요.");
+      },
+      priorityBack(){ state.screen="gearNeed"; },
+      priorityNext(){
+        if(state.gearNeed==="UNKNOWN"){ state.screen="needFollowup"; }
+        else{
+          state.scenario=state.gearNeed;
+          routeToRecommendation();
+        }
+      },
+      needFollowupBack(){ state.screen="gearPriority"; },
+      needFollowupNext(){ routeToRecommendation(); },
+      coachBack(){ state.screen="gearPriority"; },
+      askCoachAgain(){
+        const input=document.getElementById("coachQuery");
+        if(input) state.freeGearQuery=input.value;
+        if(!applyFreeQuery()) showToast("궁금한 내용을 한 줄로 적어주세요.");
+        else showToast("질문을 다시 읽고 추천 방향을 바꿨어요.");
+      },
+      askCompareCoach(){
+        const input=document.getElementById("compareQuery");
+        if(input) state.compareQuestion=input.value.trim();
+        if(!state.compareQuestion){ showToast("세 후보에 대해 궁금한 점을 적어주세요."); return; }
+        state.compareAnswer=buildCompareAnswer(state.compareQuestion);
+        pendingReveal = "#coachAnswer";
+      },
+      toRecommendation(){
+        routeToRecommendation();
+      },
+      recommendationBack(){ state.screen="gearPriority"; },
+      /* 칩에 걸린 조건은 목적·우선순위 둘 다다. 우선순위 화면으로만 보내면
+         "기준 수정"이라는 이름이 거짓말이 된다. */
+      editRecommendationCriteria(){ state.screen="gearNeed"; },
+      saveRunnerCard(){ showToast("카드 저장은 MVP에서 연결돼요. 지금은 자리만 확인합니다."); },
+      shareRunnerCard(){ showToast("공유는 MVP에서 연결돼요. 지금은 자리만 확인합니다."); },
+      restart(){ resetState(); }
+    };
+
+    if(actions[action]) actions[action]();
+    render();
+  });
+
+  app.addEventListener("input", e=>{
+    if(e.target.id==="returningNickname"){
+      state.returningNickname=e.target.value;
+      const btn=app.querySelector('[data-action="loadExistingRunner"]');
+      if(btn) btn.disabled=!(state.returningNickname.trim().length>0 && /^\d{4}$/.test(state.returningPin));
+      return;
+    }
+    if(e.target.id==="returningPin"){
+      const clean=e.target.value.replace(/\D/g,"").slice(0,4);
+      e.target.value=clean;
+      state.returningPin=clean;
+      const btn=app.querySelector('[data-action="loadExistingRunner"]');
+      if(btn) btn.disabled=!(state.returningNickname.trim().length>0 && /^\d{4}$/.test(state.returningPin));
+      return;
+    }
+    if(e.target.id==="runDistance"){
+      state.runEntry.distance=e.target.value;
+      const km=Number(state.runEntry.distance);
+      const btn=app.querySelector('[data-action="saveRunEntry"]');
+      if(btn) btn.disabled=!(Number.isFinite(km) && km>0 && km<=100 && !!state.runEntry.shoe);
+      return;
+    }
+    if(e.target.id==="gearQuery" || e.target.id==="coachQuery"){
+      state.freeGearQuery = e.target.value;
+    }
+    if(e.target.id==="compareQuery"){
+      state.compareQuestion = e.target.value;
+    }
+    /* 재렌더 없이 걸러낸다 — 입력 중 포커스와 캐럿을 잃지 않기 위해서다 */
+    if(e.target.id==="shoeSearch"){
+      const raw=e.target.value.trim();
+      state.shoeQuery=raw;
+      const q=raw.toLowerCase();
+      let shown=0;
+      app.querySelectorAll("#shoeOptions [data-shoe]").forEach(btn=>{
+        const hit=btn.dataset.shoe.toLowerCase().includes(q);
+        btn.hidden=!hit;
+        if(hit) shown++;
+      });
+      const empty=app.querySelector("#shoeEmpty");
+      const custom=app.querySelector("#shoeCustom");
+      if(empty) empty.hidden = !(raw && shown===0);
+      if(custom){
+        custom.hidden = !raw;
+        custom.querySelector(".shoe-custom-name").textContent = raw;
+      }
+    }
+  });
+
+  render();
+
+  /* 첫 렌더가 웹폰트 로드보다 앞설 수 있다. 폴백 메트릭으로 맞춘 크기는
+     Archivo가 붙는 순간 어긋나므로, 폰트가 준비되면 한 번 다시 맞춘다. */
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(fitDisplayTitles);
+  }
+  /* 회전·창 크기 변경·데스크톱 셸 폭 변화를 모두 잡는다.
+     셸의 폭만 관찰하므로 글자 크기 변경이 다시 관찰을 유발하지 않는다. */
+  if(window.ResizeObserver){
+    let lastWidth = 0, t = null;
+    new ResizeObserver(entries => {
+      const w = Math.round(entries[0].contentRect.width);
+      if(w === lastWidth) return;
+      lastWidth = w;
+      clearTimeout(t);
+      t = setTimeout(fitDisplayTitles, 80);
+    }).observe(app);
+  }else{
+    window.addEventListener("resize", fitDisplayTitles);
+  }
+})();
+</script>
+</body>
+</html>

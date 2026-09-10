@@ -9,12 +9,16 @@ node_modules/
 # Build
 dist/
 build/
+.next/
 
 # Logs
 *.log
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# 디자인 툴 런타임 산출물 (재생성됨)
+.impeccable/
 
 # Windows
 Thumbs.db

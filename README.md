@@ -71,6 +71,29 @@ Recommendation DB는 추천 로직의 기준 데이터로 사용합니다.
 
 Claude Code는 작업 전 `CLAUDE.md`를 가장 먼저 확인합니다.
 
+### Prototype 단계 산출물 (2026-09-10 동기화)
+
+작업 PC에서만 존재하던 아래 자산을 레포로 옮겼습니다.
+
+| 경로 | 무엇 |
+|---|---|
+| `PRODUCT.md` | 제품 정의 · 사용자 · 확정 규칙 · 보유 근거 요약 |
+| `DESIGN.md` | 「레인 배정」 디자인 시스템 (색·타이포·컴포넌트 토큰) |
+| `docs/DECISIONS.md` | 기획 문서 간 충돌 해소 기록 (D-01~D-09) |
+| `docs/UX_Prototype_Fix_Plan_v1.0.md` | UX 개선 계획 |
+| `docs/superpowers/` | 프로토타입 제작 당시 plan / spec 기록 |
+| `seed/products.v0.2.json` | Product DB `PDB_v0.2` 정규화 산출물 (제품 61 · Evidence 397) |
+| `scripts/seed/` | xlsx → JSON 변환 및 검증 파이프라인 (`GM-060` 선행 구현) |
+| `src/domain/shared/vocabulary.ts` | 도메인 용어 · Rule Version 상수 |
+| `archive/` | 프로토타입 v1.2 및 보관 규칙 |
+
+> ⚠️ **정본 판정 보류.** `archive/`의 프로토타입 v1.2와 루트의 v1.5는 비주얼 월드도
+> Runner Type 체계(5종 vs 6종)도 다릅니다. 판정 전까지 **신규 구현은 `CLAUDE.md`가
+> 지정한 v1.5와 최신 기획서를 따릅니다.** 상세는 `docs/DECISIONS.md` D-09 참조.
+
+`scripts/seed/`는 `PDB_v0.2` xlsx를 대상으로 작성되어 있어, 현재 `10-A v1.5`에 맞춰
+갱신이 필요합니다.
+
 ---
 
 ## 4. Recommended Project Structure
