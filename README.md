@@ -71,6 +71,12 @@ Recommendation DB는 추천 로직의 기준 데이터로 사용합니다.
 
 Claude Code는 작업 전 `CLAUDE.md`를 가장 먼저 확인합니다.
 
+### Current Status
+
+- `docs/STATUS.md`
+
+작업을 이어서 시작할 때 확인합니다. Git 상태, 백로그 진행률, 현재 블로커, 다음 순서가 정리돼 있습니다.
+
 ### Prototype 단계 산출물 (2026-09-10 동기화)
 
 작업 PC에서만 존재하던 아래 자산을 레포로 옮겼습니다.
