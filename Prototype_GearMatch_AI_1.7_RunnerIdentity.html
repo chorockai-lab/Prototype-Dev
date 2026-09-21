@@ -34,6 +34,7 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 .gm-chip-choice:not(.gm-selected),.gm-list-choice:not(.gm-selected){background:transparent!important;color:#f2f2ee!important;border-color:rgba(242,242,238,.28)!important}
 .gm-chip-choice.gm-selected,.gm-list-choice.gm-selected{background:#D7FF2E!important;color:#070707!important;border-color:#D7FF2E!important;font-weight:800!important;animation:paintIn .22s var(--ease-out) both}
 .gm-list-choice.gm-selected span:last-child{border-color:#070707!important;background:#070707!important}
+.gm-list-choice.gm-selected small{color:rgba(7,7,7,.68)!important}
 .gm-reveal-sweep{transform-origin:left center;animation:sweepAcross .5s var(--ease-out) both}
 .gm-reveal-type{animation:paintIn .58s var(--ease-out) .28s both}
 .gm-reveal-marks span{transform-origin:left center;animation:markFill .32s var(--ease-out) both}
@@ -51,6 +52,7 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 
 /* v2.1 — prevent bottom action/content overlap on long screens */
 .gm-screen[data-screen="s07"] .gm-card,
+.gm-screen[data-screen="s12"] .gm-card,
 .gm-screen[data-screen="s16"] .gm-card{
   height:auto!important;
   min-height:100%;
@@ -1244,7 +1246,7 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 <button data-action="runCardToHome" style="width:100%;border:1px solid rgba(242,242,238,.28);background:transparent;color:#f2f2ee;min-height:48px;margin-top:9px;display:flex;align-items:center;justify-content:center;font:600 13px 'Pretendard Variable',sans-serif">내 러닝에 저장하고 홈으로</button>
 </div>
 </div></section>
-<section class="gm-screen" data-screen="s18" id="screen-s18"><div class="dv-card gm-card" style="width:100%;height:880px;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
+<section class="gm-screen" data-screen="s18" id="screen-s18"><div class="dv-card gm-card" style="width:100%;height:812px;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
 <div style="display:flex;justify-content:space-between;padding:13px 18px 0;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.45)"><span>9:41</span><span>MY RUNNING</span><span>▮▮▮</span></div>
 <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 18px 0"><button data-action="backCard" style="justify-self:start;border:0;background:transparent;color:#f2f2ee;font:700 12px 'Pretendard Variable',sans-serif;padding:8px 0;opacity:.86">← 뒤로</button><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;letter-spacing:.22em">GEARMATCH AI</div><span></span></div>
 <div style="padding:26px 18px 0">
@@ -1338,7 +1340,7 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 <button data-action="toGear" style="width:100%;border:0;background:var(--runner-accent);color:#070707;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.025em">내 Gear 찾아보기<span style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:13px">→</span></button>
 </div>
 </div></section>
-<section class="gm-screen" data-screen="s12" id="screen-s12"><div class="dv-card gm-card" style="width:100%;height:1000px;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
+<section class="gm-screen" data-screen="s12" id="screen-s12"><div class="dv-card gm-card" style="width:100%;height:880px;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
 <div style="display:flex;justify-content:space-between;padding:13px 18px 0;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.45)"><span>9:41</span><span>GEAR</span><span>▮▮▮</span></div>
 <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 18px 0"><button data-action="backCard" style="justify-self:start;border:0;background:transparent;color:#f2f2ee;font:700 12px 'Pretendard Variable',sans-serif;padding:8px 0;opacity:.86">← 뒤로</button><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;letter-spacing:.22em">GEARMATCH AI</div><span></span></div>
 <div style="padding:22px 18px 0">
@@ -1369,7 +1371,7 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 </div>
 <div style="margin-top:10px;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:rgba(242,242,238,.5)">예: 10km 기록 줄이고 싶어 · 하프 대회용이 필요해</div>
 </div>
-<div style="position:absolute;left:0;right:0;bottom:0;padding:0 18px 22px">
+<div style="position:static;margin-top:26px;padding:0 18px 22px">
 <button data-action="gearNeedNext" style="width:100%;border:0;background:#d7ff2e;color:#070707;min-height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.025em">선택해서 계속<span style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:13px">→</span></button>
 </div>
 </div></section>
