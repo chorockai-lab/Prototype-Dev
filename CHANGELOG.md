@@ -21,6 +21,16 @@ Base: `prototype-v1.6`
 
 포함하지 않음: Strava/NRC/Garmin 연동, OCR, Community, Apparel 추천, Card Editor, Commerce
 
+### 문서 정합 (2026-09-21)
+
+- `docs/DECISIONS.md` **D-09 정본 판정 확정** — 정본 = 최신 기획서 + Prototype v1.7,
+  Runner Type **6종**, Current Shoe Active 1개, Similar Runner P0(Gear Discovery 한정), Product DB `10-A v1.5`
+- D-01 / D-02 / D-03 / D-08에 대체 표기, Rule Version 표를 확정 버전으로 갱신
+- `04` MVP Scope와 `05` User Flow를 v1.7 경험 기준으로 개정
+- `CLAUDE.md` 경로 오류 수정, Visual SSOT를 v1.7로 변경
+- `DESIGN.md`가 archive v1.2 계열임을 명시
+- 04~09 문서의 상호 참조 버전을 실제 파일 기준으로 정렬
+
 ## v1.6 — UX Clarity
 
 파일: `Prototype_GearMatch_AI_1.6_UXClarity.html`
