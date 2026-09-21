@@ -105,11 +105,12 @@ Claude Code는 작업 전 `CLAUDE.md`를 가장 먼저 확인합니다.
 | `seed/products.v0.2.json` | Product DB `PDB_v0.2` 정규화 산출물 (제품 61 · Evidence 397) |
 | `scripts/seed/` | xlsx → JSON 변환 및 검증 파이프라인 (`GM-060` 선행 구현) |
 | `src/domain/shared/vocabulary.ts` | 도메인 용어 · Rule Version 상수 |
-| `archive/` | 프로토타입 v1.2 및 보관 규칙 |
+| `archive/` | 프로토타입 v1.2 및 보관 규칙 (보관본) |
 
-> ⚠️ **정본 판정 보류.** `archive/`의 프로토타입 v1.2와 루트의 v1.5는 비주얼 월드도
-> Runner Type 체계(5종 vs 6종)도 다릅니다. 판정 전까지 **신규 구현은 `CLAUDE.md`가
-> 지정한 v1.5와 최신 기획서를 따릅니다.** 상세는 `docs/DECISIONS.md` D-09 참조.
+> ✅ **정본 판정 완료 (2026-09-21).** 정본은 **레포 최신 기획서 + `Prototype v1.7`** 계열입니다.
+> Runner Type은 **6종**으로 확정했고, Current Shoe는 **Active 1개**, Product DB SSOT는 **`10-A v1.5`** 입니다.
+> `archive/`의 v1.2와 루트의 v1.5 / v1.6은 보관본이며 새 구현의 기준으로 쓰지 않습니다.
+> 상세는 `docs/DECISIONS.md` D-09 참조.
 
 `scripts/seed/`는 `PDB_v0.2` xlsx를 대상으로 작성되어 있어, 현재 `10-A v1.5`에 맞춰
 갱신이 필요합니다.

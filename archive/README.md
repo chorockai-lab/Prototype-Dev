@@ -1,9 +1,13 @@
 # archive
 
-정본에서 물러났거나, **아직 정본 여부가 확정되지 않은** 산출물을 보관한다.
+정본에서 물러난 산출물을 보관한다.
 
-여기 있는 것을 기준으로 새 화면을 만들지 않는다. 다만 아래 v1.2는 단순 폐기가 아니라
-**판정 보류 상태**이므로 주의해서 읽는다.
+여기 있는 것을 기준으로 새 화면을 만들지 않는다. 다만 v1.2는 단순 폐기가 아니라
+**근거 자료로 남겨둔 것**이므로 주의해서 읽는다.
+
+> ✅ **2026-09-21 정본 판정 완료 (D-09).** 정본은 레포 루트의
+> `Prototype_GearMatch_AI_1.7_RunnerIdentity.html` + 최신 기획서 계열이다.
+> v1.2는 물론, 루트의 v1.5 / v1.6도 이제 **보관본**이다.
 
 ---
 
@@ -36,22 +40,20 @@
 
 ---
 
-## ⚠️ v1.2와 루트 v1.5는 서로 다른 갈래다
+## v1.2는 정본 계열이 아니다 — 판정 완료
 
-레포 루트의 `Prototype_GearMatch_AI_1.5_ShoeImages_Embedded.html`(2026-09-04)과
-이 v1.2는 비주얼 월드도 타입 체계도 다르다.
+이 v1.2와 루트 계열(v1.5 → v1.6 → v1.7)은 비주얼 월드도 타입 체계도 다르다.
 
-| | archive v1.2 | 루트 v1.5 |
+| | archive v1.2 | **정본 — 루트 v1.7** |
 |---|---|---|
 | 비주얼 | 트랙 적갈색 `#A63D25` + Archivo | 라임/다크 `#D7FF2E` + Boldonse |
-| Runner Type | 5 Core + Modifier 4 | 6종 (`ROUTINE_RUNNER` 외) |
-| 근거 문서 | `DESIGN.md`, `docs/DECISIONS.md` | `04`·`06` 기획서, `CLAUDE.md` |
+| Runner Type | 5 Core + Modifier 4 | **6종** (`ROUTINE_RUNNER` 외) |
+| 근거 문서 | `DESIGN.md`, 구 `docs/DECISIONS.md` D-01~D-08 | `00`·`04`·`06` 기획서, `CLAUDE.md`, D-09 |
 
-**어느 쪽이 정본인지는 아직 확정되지 않았다.** `docs/DECISIONS.md` **D-09** 참조.
-MVP Scope Lock(`09` 문서 GM-001) 시점에 판정한다. 그때까지 v1.2를 폐기하지 않는다.
+**2026-09-21 D-09에서 루트 계열을 정본으로 확정했다.** `docs/DECISIONS.md` **D-09** 참조.
 
-`CLAUDE.md`는 현재 v1.5를 Visual SSOT로 지정하고 있으므로, **판정 전까지 신규 구현은
-v1.5를 따른다.** v1.2는 근거 자료로만 쓴다.
+v1.2는 폐기하지 않는다. 5 Core + Modifier 판정 규칙(`type-rule.js`)과 충돌 분석 근거는
+앞으로도 다시 읽을 수 있어야 하기 때문이다. 다만 **새 구현의 기준으로는 쓰지 않는다.**
 
 ---
 
@@ -81,4 +83,8 @@ python -m http.server 4322 --directory archive
 ```
 
 `.claude/launch.json`에 `archive-v1.2`(4322)로 등록되어 있다.
-루트 v1.5는 `prototype-v1.5`(4321)로 띄운다.
+정본 프로토타입(루트 v1.7)은 아래처럼 띄운다.
+
+```bash
+python -m http.server 4321 --directory .
+```

@@ -45,11 +45,12 @@ export type PerfScore = 1 | 2 | 3 | 4 | 5;
 
 /** DECISIONS.md 의 Rule Version. 변경 시 반드시 올린다. */
 export const RULE_VERSIONS = {
-  productDb: 'PDB_v0.2',
-  normalization: 'PERF_NORM_v0.2',
+  productDb: 'product_db_v1.5',
+  normalization: 'product_norm_v1.1',
+  /** Runner Type 6종 확정(D-09). GM-031 착수 시 TYPE_RULE_v0.2로 올린다. */
   runnerType: 'TYPE_RULE_v0.1',
   similarity: 'SIM_v0.1',
-  recommendation: 'REC_v0.1',
+  recommendation: 'gear_reco_v1.1',
   prompt: 'GEAR_COACH_v0.1',
   consent: 'CONSENT_v0.1',
 } as const;

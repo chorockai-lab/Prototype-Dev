@@ -1,6 +1,6 @@
 # GearMatch AI — 프로젝트 현황
 
-**갱신일:** 2026-09-17
+**갱신일:** 2026-09-21
 **목적:** 집 PC / 회사 PC 어디서 열어도 "지금 어디까지 왔고 다음에 뭘 하면 되는지"를 이 문서 하나로 파악한다.
 
 > 이 문서는 **현황 기록**이다. 기획 결정은 `docs/DECISIONS.md`, 개발 규칙은 `CLAUDE.md`,
@@ -11,8 +11,10 @@
 ## 1. 한 줄 요약
 
 **기획 문서는 완비됐고, 실제 애플리케이션 코드는 아직 0줄이다.**
-백로그 기준으로 **GM-001(Scope Lock)도 미완료** 상태이며, 그 안에 포함된
-**D-09 정본 판정(Runner Type 5종 vs 6종)** 이 이후 모든 구현을 막고 있다.
+2026-09-21에 **D-09 정본 판정이 완료**돼 가장 큰 블로커는 풀렸다.
+정본은 **레포 최신 기획서 + `Prototype v1.7`**, Runner Type은 **6종**이다.
+남은 것은 GM-001 Scope Lock의 나머지 작업(레포 구조 재배치, `RULE_VERSIONS` 갱신,
+`scripts/seed/` 재작성)이다.
 
 ---
 
@@ -25,8 +27,9 @@ D:\Claude\GearMatch AI MVP\        ← 여기서만 작업한다
 ```
 
 - Remote: `https://github.com/chorockai-lab/Prototype-Dev.git`
-- Branch: `main`
-- 2026-09-17 기준 working tree clean, 원격과 동기화됨 (`ccd66a0`)
+- Branch: `main` / 작업 Branch `prototype/v1.7-runner-identity`
+- Tag: `prototype-v1.6` (v1.6 보존 기준점). `prototype-v1.7`은 main merge 후 생성
+- 2026-09-21 기준 v1.7 Prototype과 문서 정합 작업이 `prototype/v1.7-runner-identity`에 올라가 있다
 
 ### ⚠️ 유령 저장소 (정리 필요)
 
@@ -86,10 +89,10 @@ D:\Claude\.git                     ← 커밋 0개 · 리모트 없음 · branch
 
 | Epic | 내용 | 상태 |
 |---|---|---|
-| E00 Scope Lock & Foundation | GM-001~004 | **미완료** — GM-001부터 막힘 |
+| E00 Scope Lock & Foundation | GM-001~004 | **진행 중** — D-09 판정 완료, GM-001 잔여 작업만 남음 |
 | E01 Prototype Migration | GM-010~011 | 미착수 |
 | E02 User & Authentication | GM-020~024 | 미착수 |
-| E03 Runner Test & Identity | GM-030~033 | **D-09에 차단됨** |
+| E03 Runner Test & Identity | GM-030~033 | 미착수 — **차단 해제됨** (Runner Type 6종 확정) |
 | E04 Profile & Current Shoe | GM-040~042 | 미착수 |
 | E05 Activity & Shoe Mileage | GM-050~053 | 미착수 |
 | E06 Product DB Foundation | GM-060~063 | **부분 선행** — `scripts/seed/`가 GM-060 일부 구현 |
@@ -105,52 +108,42 @@ D:\Claude\.git                     ← 커밋 0개 · 리모트 없음 · branch
 
 ## 5. 지금 막고 있는 것
 
-### 🔴 블로커 — D-09 프로토타입 정본 판정
+### ✅ 해소됨 — D-09 프로토타입 정본 판정 (2026-09-21)
 
-`docs/DECISIONS.md` D-09에 `보류`로 기록돼 있다. 두 갈래가 정면 충돌한다.
+`docs/DECISIONS.md` D-09가 `확정`으로 기록됐다.
 
-| 항목 | A안 — D-01~D-08 계열 | B안 — 레포 최신 기획서 |
-|---|---|---|
-| 근거 문서 | `01 v1.4`, `04 v0.4`, `05 v0.2`, `06 v0.1` | `01 v2.1`, `04 v1.1`, `05`~`09 v1.0` |
-| 프로토타입 | `archive/..._v1.2_single.html` (09-02) | 루트 `..._1.5_...html` (09-04) |
-| 비주얼 | 「레인 배정」 트랙 적갈색 `#A63D25` | 라임/다크 `#D7FF2E` |
-| Runner Type | **5 Core + Modifier 4** | **6종 enum** |
-| Current Shoe | Closet 최대 3 | Active 1개 |
-| Similar Runner | P0 Evidence | P2 |
-| Product DB | `PDB_v0.2` — 61개 / Eligible 29 | `10-A v1.5` — 35개 / VERIFIED 10 |
-
-**A안 5종 + Modifier**
-`RHYTHM_MAKER` / `MOMENTUM_BUILDER` / `DISTANCE_ARCHITECT` / `PACE_TACTICIAN` / `VERSATILE_EXPLORER`
-Modifier: `COMFORT_FIRST` / `SPEED_CURIOUS` / `DISTANCE_UP` / `RACE_READY`
-
-**B안 6종** (`04 §11`)
-`ROUTINE RUNNER` / `EXPLORE RUNNER` / `DISTANCE RUNNER` / `PACE RUNNER` / `RACE RUNNER` / `ALL-AROUND RUNNER`
-
-- **판정 시점: GM-001 Scope Lock.** 그 전까지 어느 쪽도 정본이라 부르지 않는다
-- **판정 전 신규 구현은 `CLAUDE.md`가 지정한 v1.5 + 최신 기획서(B안)를 따른다**
-- Runner Type이 정해지지 않으면 **GM-031(Runner Type Engine)에 착수할 수 없고**,
-  그 위에 얹히는 추천 엔진(E07) 전체가 멈춘다
-- D-06(Caution 3단계)은 "Hard 적용 시 후보 0개"라는 실측에서 나온 것이라
-  타입 체계와 무관하게 유효하다
-
-### 🟠 구조 불일치 — `CLAUDE.md`의 경로가 전부 실존하지 않음
-
-| `CLAUDE.md` 선언 | 실제 |
+| 항목 | 확정값 |
 |---|---|
-| `prototype/Prototype_..._1.5_...html` | 루트에 있음 |
-| `docs/08_...md`, `docs/09_...md` | 루트에 평면 배치 |
-| `docs/10_..._Rulebook_v1.0.md` | **파일 없음** |
-| `data/10-A_....xlsx` | 루트에 있음 |
-| `docs/background/01~03` | 없음 (루트 평면) |
+| 정본 문서 | `00 v1.1`, `01 v2.1`, `04 v1.1`, `05`~`09 v1.0` |
+| 정본 프로토타입 | `Prototype_GearMatch_AI_1.7_RunnerIdentity.html` |
+| 비주얼 | 라임/다크 `#D7FF2E` |
+| Runner Type | **6종 enum** (`ROUTINE` / `EXPLORE` / `DISTANCE` / `PACE` / `RACE` / `ALL-AROUND`) |
+| Current Shoe | Active 1개 (Multi-shoe는 P2) |
+| Similar Runner | **P0 — Gear Discovery 한정** (사람 탐색·프로필은 P2) |
+| Product DB | `10-A v1.5` (`product_db_v1.5`) |
 
-GM-001 Task "00~10 문서 Repository `/docs`에 배치"가 미완료라서 생긴 문제다.
-Claude Code가 `CLAUDE.md`대로 경로를 찾으면 전부 실패한다.
+- `archive/`의 v1.2와 루트의 v1.5 / v1.6은 **보관본**이다. 삭제하지 않고 기준으로도 쓰지 않는다
+- **GM-031(Runner Type Engine) 착수 차단은 해제됐다**
+- D-01 / D-02 / D-03 / D-08은 대체됐고, 각 항목에 대체 내용을 붙였다
+- D-04~D-07은 그대로 유효하다
+
+### ✅ 해소됨 — `CLAUDE.md` 경로 불일치 (2026-09-21)
+
+`CLAUDE.md` §3을 실제 레포 구조(루트 평면 배치)에 맞춰 수정했다.
+존재하지 않던 `docs/10_..._Rulebook_v1.0.md`, `data/`, `docs/background/` 참조는 제거했다.
+
+> 레포 구조를 `CLAUDE.md` 선언대로 재배치하는 방향(문서를 `docs/`로 옮기는 것)도
+> 가능하지만, 지금은 **문서를 실제 구조에 맞춘 쪽**으로 정리했다.
+> 재배치를 원하면 GM-001에서 별도로 진행한다.
 
 ### 🟡 데이터 파이프라인 버전 불일치
 
+**이건 아직 남아 있다.**
+
 `scripts/seed/`는 `PDB_v0.2`(제품 61 · Evidence 397) 기준으로 작성돼 있다.
-현재 `CLAUDE.md`가 지정한 정본은 `product_db_v1.5` = `10-A v1.5`(35개 / VERIFIED 10)다.
-`src/domain/shared/vocabulary.ts`의 `RULE_VERSIONS`도 v0.1/v0.2 계열로 남아 있다.
+D-09가 확정한 정본은 `product_db_v1.5` = `10-A v1.5`(35개 / VERIFIED 10)다.
+`src/domain/shared/vocabulary.ts`의 `RULE_VERSIONS`는 2026-09-21에 확정 버전으로 갱신했지만,
+**`scripts/seed/` 파이프라인 재작성은 미착수**다.
 
 ---
 
@@ -160,15 +153,17 @@ Claude Code가 `CLAUDE.md`대로 경로를 찾으면 전부 실패한다.
 
 `D:\Claude\.git` 제거, 중복 정리, 작업 디렉터리를 레포 폴더로 고정. (§2 참조)
 
-### 1단계 — GM-001 Scope Lock `미착수` ← **실질적인 다음 할 일**
+### 1단계 — GM-001 Scope Lock `진행 중` ← **실질적인 다음 할 일**
 
-- [ ] **D-09 판정** — Runner Type 5종 vs 6종 결정 (의사결정권자: PM)
-- [ ] 판정 결과를 `docs/DECISIONS.md` D-09에 `승인`으로 기록
-- [ ] 폐기된 쪽의 프로토타입·디자인 자산 `archive/` 정리 및 사유 명시
-- [ ] 레포 구조를 `CLAUDE.md` 선언대로 재배치 (`docs/`, `data/`, `prototype/`)
-- [ ] 문서 10 Rulebook 작성 또는 `CLAUDE.md` §3에서 참조 제거
-- [ ] `RULE_VERSIONS` 상수를 확정 버전으로 갱신
-- [ ] P0 기능 목록 단일 문서화
+- [x] **D-09 판정** — Runner Type **6종** 확정 (2026-09-21)
+- [x] 판정 결과를 `docs/DECISIONS.md` D-09에 `확정`으로 기록
+- [x] 문서 10 Rulebook 참조를 `CLAUDE.md` §3에서 제거
+- [x] `RULE_VERSIONS` 상수를 확정 버전으로 갱신
+- [x] 문서 간 상호 참조 버전 정합 (04~09의 상위 기준 문서, 기준 Prototype)
+- [ ] 보관본(`archive/` v1.2, 루트 v1.5)의 보관 사유를 `archive/README.md`에 명시
+- [ ] 레포 구조 재배치 여부 결정 (`docs/`, `data/`, `prototype/`로 옮길지)
+- [ ] `scripts/seed/`를 `10-A v1.5` 기준으로 재작성
+- [ ] P0 기능 목록 단일 문서화 (v1.7의 Today's Run / Share Card / Insight / Runners Like You 포함)
 
 ### 2단계 — 기반 공사
 
