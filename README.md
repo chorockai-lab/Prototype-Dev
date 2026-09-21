@@ -61,7 +61,21 @@ Recommendation DB는 추천 로직의 기준 데이터로 사용합니다.
 
 ### Prototype
 
-- `Prototype_GearMatch_AI_...html`
+**Current Prototype**
+
+Latest:
+- v1.7 Runner Identity — `Prototype_GearMatch_AI_1.7_RunnerIdentity.html`
+
+Previous:
+- v1.6 UX Clarity — `Prototype_GearMatch_AI_1.6_UXClarity.html`
+- v1.5 Shoe Images Embedded — `Prototype_GearMatch_AI_1.5_ShoeImages_Embedded.html`
+
+Tags:
+- `prototype-v1.6`
+- `prototype-v1.7` (main merge 후 생성)
+
+버전별 변경 내역은 `CHANGELOG.md`를 확인합니다.
+이전 버전 파일은 덮어쓰지 않고 그대로 보존합니다.
 
 현재 Prototype은 MVP의 **User Flow / UI / Interaction 기준**으로 사용합니다.
 
