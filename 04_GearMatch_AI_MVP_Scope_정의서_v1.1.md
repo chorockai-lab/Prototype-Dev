@@ -31,8 +31,10 @@
   - `07_GearMatch_AI_Recommendation_및_AI_Gear_Coach_정의서_v1.0.md`
   - `08_GearMatch_AI_MVP_개발_명세서_v1.0.md`
   - `09_GearMatch_AI_MVP_개발_Backlog_및_Acceptance_Criteria_v1.0.md`
-  - `10_GearMatch_AI_러닝화_DB_및_Recommendation_Rulebook_v1.0.md`
   - `10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx`
+
+> 참고: `10_..._Rulebook_v1.0.md`는 작성된 적이 없어 참조에서 제거했다 (2026-09-21).
+> Recommendation Rule은 `07` 문서와 `10-A v1.5`를 정본으로 본다.
 
 ---
 

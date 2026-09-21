@@ -2179,10 +2179,13 @@ Cohort 비교를 위해 가능하면 유지:
 
 다음은 개발 Story로 만들지 않는다.
 
+> **2026-09-21 개정 (D-09 / Prototype v1.7).** `Similar Runner`는 목록에서 뺐다.
+> **Gear Discovery 한정으로 P0**가 됐기 때문이다 (v1.7 `RUNNERS LIKE YOU`).
+> 사람 탐색(`Other Runner Profile`, `Runner Discovery`)과 Community는 그대로 P2 / OUT이다.
+
 ```text
 Avatar
 Other Runner Profile
-Similar Runner
 Runner Discovery
 Community Feed
 Follow
