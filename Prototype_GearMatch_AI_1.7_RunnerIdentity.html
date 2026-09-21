@@ -302,6 +302,12 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 .gm-screen[data-screen="s06"]>.gm-card>div:nth-child(2){
   top:198px!important;
 }
+.gm-why-row{display:flex;gap:10px;align-items:flex-start;font:600 14px/1.45 'Pretendard Variable',Pretendard,sans-serif;color:#f2f2ee}
+.gm-why-mark{flex:0 0 6px;height:6px;margin-top:7px;background:var(--runner-accent)}
+.gm-screen[data-screen="s06"] .gm-reveal-why,
+.gm-screen[data-screen="s06"] .gm-reveal-cta{
+  animation:gmPosterMetaIn .38s var(--ease-out) .74s both;
+}
 .gm-screen[data-screen="s06"] .gm-reveal-sweep{
   height:8px!important;background:#f2f2ee!important;
   animation:gmPosterRailIn .48s var(--ease-out) both!important;
@@ -895,9 +901,16 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 <span style="flex:1;height:12px;background:rgba(242,242,238,.16);animation-delay:0.385s"></span>
 <span style="flex:1;height:12px;background:rgba(242,242,238,.16);animation-delay:0.460s"></span>
 </div>
-<div style="margin-top:22px;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.5)">CARD RC-0264-26 · ISSUING…</div>
+<div class="gm-reveal-why" style="margin-top:24px;border-top:1px solid rgba(242,242,238,.16);padding-top:15px">
+<div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;letter-spacing:.22em;color:rgba(242,242,238,.5)">WHY THIS IS YOU</div>
+<div data-role="reveal-why" style="margin-top:12px;display:grid;gap:9px"></div>
+</div>
+<div style="margin-top:16px;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.5)">CARD RC-0264-26 · ISSUED</div>
 </div></div>
 <div style="position:absolute;left:0;right:0;bottom:0;height:96px;background-image:conic-gradient(rgba(242,242,238,.1) 0 25%,transparent 0 50%,rgba(242,242,238,.1) 0 75%,transparent 0);background-size:7px 7px"></div>
+<div class="gm-reveal-cta" style="position:absolute;left:0;right:0;bottom:0;padding:0 18px 22px">
+<button data-action="toIdentityCard" style="width:100%;border:0;background:var(--runner-accent);color:#070707;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.025em">내 Runner ID 카드 보기<span style="width:24px;height:24px;background-image:conic-gradient(#070707 0 25%,transparent 0 50%,#070707 0 75%,transparent 0);background-size:5px 5px"></span></button>
+</div>
 </div></section>
 <section class="gm-screen" data-screen="s07" id="screen-s07"><div class="dv-card gm-card" style="width:100%;min-height:1050px;height:auto;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
 <div style="display:flex;justify-content:space-between;padding:13px 18px 0;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.45)"><span>9:41</span><span>RUNNER CARD / 001</span><span>▮▮▮</span></div>
@@ -1335,7 +1348,7 @@ function show(sid){
   $$('.gm-screen').forEach(s=>s.classList.remove('active'));
   const el=$('#screen-'+sid); if(!el)return; state.screen=sid; el.classList.add('active'); el.scrollTop=0;
   if(sid==='s03')renderQuestion();
-  if(sid==='s06'){applyType(); if(!reduced()) revealTimer=setTimeout(()=>show('s07'),1250); else show('s07')}
+  if(sid==='s06'){applyType();renderIdentityWhy()}
   if(['s07','s10'].includes(sid))applyType();
   if(sid==='s08')updateProfileNext();
   if(sid==='s11')updateRunEntryView();
@@ -1466,6 +1479,19 @@ function applyType(){
  });
  updateCompleteProfile();
 }
+const WHY_PURPOSE={HABIT:'러닝 습관을 이어가는 게 먼저',MIXED:'새로운 러닝을 시도하는 중',HEALTH:'러닝이 일상이 되어가는 중',DISTANCE:'거리를 늘려가는 데 관심',PERFORMANCE:'페이스와 기록에 민감',RACE:'목표에 맞춰 뛰는 편'};
+const WHY_TREND=['최근 흐름은 꾸준함 유지','러닝에 쓰는 시간·관심이 확대','오래·멀리 뛰는 날이 증가','페이스·기록 관심이 증가','목표·대회 훈련을 시작'];
+const WHY_GOAL={KEEP:'지금 흐름을 이어가고 싶음',UNKNOWN:'러닝 범위를 넓히고 싶음',LONGER:'긴 거리가 자연스러워지길',RECORD:'같은 거리를 조금이라도 빠르게',RACE_PREP:'목표 대회를 제대로 준비'};
+const WHY_DISTANCE={'5K':'5K 거리에 마음이 가는 중','10K':'10K 거리에 마음이 가는 중',HALF:'하프 거리에 마음이 가는 중',FULL:'풀 거리에 마음이 가는 중'};
+function renderIdentityWhy(){
+ const box=$('[data-role="reveal-why"]',$('#screen-s06'));if(!box)return;
+ const a=specFromTest(),rows=[];
+ if(WHY_PURPOSE[a.purpose])rows.push(WHY_PURPOSE[a.purpose]);
+ if(state.answers[1]!=null&&WHY_TREND[state.answers[1]])rows.push(WHY_TREND[state.answers[1]]);
+ if(WHY_GOAL[a.goal])rows.push(WHY_GOAL[a.goal]);
+ if(WHY_DISTANCE[state.distance])rows.push(WHY_DISTANCE[state.distance]);
+ box.innerHTML=rows.slice(0,4).map(t=>'<div class="gm-why-row"><span class="gm-why-mark"></span><span>'+t+'</span></div>').join('');
+}
 function afterQ5(){evaluateType();if(needsDistance())show('s05');else show('s06')}
 const COACH_MOCK={
  "훈련까지 같이 쓰려면?":{title:"훈련 활용까지 함께 보려면 Endorphin Speed 5 방향이 가장 균형적이에요.",body:"템포런과 빠른 장거리처럼 여러 종류의 빠른 훈련에 활용하기 좋은 방향이에요. 한 가지 성능만 극대화하기보다 훈련 범위를 넓게 가져가고 싶을 때 비교해보세요."},
@@ -1494,7 +1520,7 @@ document.addEventListener('click',e=>{
  if(btn.dataset.coachChip){showCoachMock(btn.dataset.coachChip);return}
  const a=btn.dataset.action;if(!a)return;
  const A={
- startTest:()=>{state.questionIndex=0;state.answers=[null,null,null,null,null];state.distance=null;state.typeResult={coreType:null,scores:null};state.stats={weeklyKm:0,weeklyRuns:0,shoeMileage:0,totalKm:0,lastRunKm:null};state.selectedRunShoe='current';show('s03')},openReturning:()=>show('s02'),backLanding:()=>show('s01'),loadExisting:()=>{state.answers=[3,3,3,3,3];state.distance='10K';state.profile={experience:'1~3년',runs:'주 3~4회',weekly:'15~30km',shoe:'Nike Pegasus 42',shoeStatus:null};state.stats={weeklyKm:18.2,weeklyRuns:3,shoeMileage:126,totalKm:284.6,lastRunKm:5.1};state.selectedRunShoe='current';evaluateType();show('s10');toast('Runner Card를 불러왔습니다.')},
+ startTest:()=>{state.questionIndex=0;state.answers=[null,null,null,null,null];state.distance=null;state.typeResult={coreType:null,scores:null};state.stats={weeklyKm:0,weeklyRuns:0,shoeMileage:0,totalKm:0,lastRunKm:null};state.selectedRunShoe='current';show('s03')},toIdentityCard:()=>show('s07'),openReturning:()=>show('s02'),backLanding:()=>show('s01'),loadExisting:()=>{state.answers=[3,3,3,3,3];state.distance='10K';state.profile={experience:'1~3년',runs:'주 3~4회',weekly:'15~30km',shoe:'Nike Pegasus 42',shoeStatus:null};state.stats={weeklyKm:18.2,weeklyRuns:3,shoeMileage:126,totalKm:284.6,lastRunKm:5.1};state.selectedRunShoe='current';evaluateType();show('s10');toast('Runner Card를 불러왔습니다.')},
  questionBack:()=>{if(state.screen==='s04'){state.questionIndex=3;show('s03')}else if(state.questionIndex>0){state.questionIndex--;renderQuestion()}else show('s01')},backQuestion5:()=>show('s04'),saveCard:()=>toast('카드 저장은 MVP에서 연결됩니다.'),shareCard:()=>toast('공유 기능은 MVP에서 연결됩니다.'),toProfile:()=>show('s08'),backCardLite:()=>show('s07'),profileNext:()=>{if(!state.profile.experience||!state.profile.runs||!state.profile.weekly){toast('러닝 경력·횟수·주간 거리를 선택해주세요.');return}show('s09')},profileBack:()=>show('s08'),profileComplete:()=>{if(!state.profile.shoe&&!state.profile.shoeStatus){toast('현재 러닝화 또는 해당 상태를 선택해주세요.');return}show('s10')},backProfile:()=>show('s09'),toGear:()=>show('s12'),toRun:()=>show('s11'),backCardComplete:()=>show('s10'),saveRun:()=>{const el=$('[data-role="run-distance"]');const n=Number((el?.textContent||'').replace(/[^0-9.]/g,''));if(!Number.isFinite(n)||n<=0){toast('러닝 거리를 입력해주세요.');return}const before={...state.stats};state.runDistance=n;state.stats.weeklyKm=Number((state.stats.weeklyKm+n).toFixed(1));state.stats.weeklyRuns+=1;state.stats.totalKm=Number((state.stats.totalKm+n).toFixed(1));state.stats.lastRunKm=n;const shoeAdded=state.selectedRunShoe==='current'&&Boolean(state.profile.shoe);if(shoeAdded)state.stats.shoeMileage=Number((state.stats.shoeMileage+n).toFixed(1));const after={...state.stats};show('s10');setTimeout(()=>showRunFeedback(n,before,after,shoeAdded),90)},backCard:()=>show('s10'),gearQuestion:()=>toast('자유 질문은 AI Gear Coach에서 연결됩니다.'),gearNeedNext:()=>{if(!state.gearNeed){toast('장비 목적을 하나 골라주세요.');return}show('s13')},backGearNeed:()=>show('s12'),priorityNext:()=>{if(!state.priority){toast('우선순위를 하나 골라주세요.');return}if(state.gearNeed==='아직 잘 모르겠어요')show('s14');else if(!state.profile.weekly)show('s15');else show('s16')},backPriority:()=>show('s13'),followupNext:()=>{if(!state.followup){toast('한 가지를 골라주세요.');return}if(!state.profile.weekly)show('s15');else show('s16')},toRecommendation:()=>{if(!state.profile.weekly){toast('주간 거리를 하나 골라주세요.');return}show('s16')},backRecommendation:()=>show('s13'),editCriteria:()=>show('s12'),sendCoach:()=>{showCoachMock('지금 신발과 뭐가 달라?');toast('예시 답변을 보여드렸어요.')},restart:()=>{location.reload()}
  };if(A[a])A[a]();
 });
