@@ -6,20 +6,31 @@ Build the GearMatch AI Closed MVP based on the approved Prototype and planning d
 
 GearMatch AI is a Runner Identity based Gear Decision Support service.
 
-Core product loop:
+Core product loop (Prototype v1.7):
+
+RUN
+→ EXPRESS
+→ DISCOVER
+→ UNDERSTAND
+→ EXPLORE
+
+Concretely:
 
 Runner Test
-→ Runner Card
-→ Profile
-→ Current Shoe
-→ Run / Shoe Mileage
-→ Return
+→ Runner Identity Reveal
+→ Runner ID Card
+→ Today's Run (photo + distance + time, pace auto)
+→ Today's Run Share Card
+→ Running Insight
+→ Runners Like You (Shoes / Style)
 → Gear Need
 → 3 Gear Directions
 → Product Candidates
 → Recommendation Reasons
 → Feedback
 → Purchase Consideration
+
+Gear is not removed; it moves behind Identity, Activity and Expression.
 
 The MVP exists to validate:
 
@@ -36,7 +47,7 @@ Do not expand the product beyond this scope without explicit approval.
 
 The current visual and UX reference is:
 
-prototype/Prototype_GearMatch_AI_1.5_ShoeImages_Embedded.html
+Prototype_GearMatch_AI_1.7_RunnerIdentity.html  (repository root)
 
 Preserve:
 
@@ -60,24 +71,26 @@ Claude Code is the implementation engineer, not the art director.
 
 For feature and logic decisions, use this priority:
 
-1. docs/09_GearMatch_AI_MVP_개발_Backlog_및_Acceptance_Criteria_v1.0.md
-2. docs/08_GearMatch_AI_MVP_개발_명세서_v1.0.md
-3. docs/04_GearMatch_AI_MVP_Scope_정의서_v1.1.md
-4. docs/05_GearMatch_AI_User_Flow_및_Service_Blueprint_v1.0.md
-5. docs/06_GearMatch_AI_데이터_기획서_v1.0.md
-6. docs/07_GearMatch_AI_Recommendation_및_AI_Gear_Coach_정의서_v1.0.md
-7. docs/10_GearMatch_AI_러닝화_DB_및_Recommendation_Rulebook_v1.0.md
-8. data/10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx
-9. docs/00_GearMatch_AI_Master_Context_v1.1.md
+All planning documents live in the repository root, not in docs/.
+
+1. 09_GearMatch_AI_MVP_개발_Backlog_및_Acceptance_Criteria_v1.0.md
+2. 08_GearMatch_AI_MVP_개발_명세서_v1.0.md
+3. 04_GearMatch_AI_MVP_Scope_정의서_v1.1.md
+4. 05_GearMatch_AI_User_Flow_및_Service_Blueprint_v1.0.md
+5. 06_GearMatch_AI_데이터_기획서_v1.0.md
+6. 07_GearMatch_AI_Recommendation_및_AI_Gear_Coach_정의서_v1.0.md
+7. 10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx
+8. 00_GearMatch_AI_Master_Context_v1.1.md
+9. docs/DECISIONS.md (확정된 결정 · D-09 정본 판정 포함)
 
 For visual decisions:
 
-1. Current Prototype HTML
+1. Prototype_GearMatch_AI_1.7_RunnerIdentity.html (current)
 2. Approved visual assets
 3. Planning documents
 
-Read docs/background/01~03 only when product strategy, target user,
-JTBD, or hypothesis context is actually needed.
+Read 01~03 (사업·서비스 정의서 / 핵심 가설 / 타깃 사용자·JTBD) only when
+product strategy, target user, JTBD, or hypothesis context is actually needed.
 
 ---
 
@@ -175,7 +188,6 @@ Do NOT implement unless explicitly requested:
 
 - Avatar
 - Card customization
-- Similar Runner
 - Other Runner Profile
 - Community
 - Follow
@@ -189,6 +201,13 @@ Do NOT implement unless explicitly requested:
 - Marketplace
 - Payment
 - Advanced ML recommendation
+
+Similar Runner is IN scope as of Prototype v1.7, but only as Gear Discovery
+("나와 조건이 비슷한 러너들이 사용하는 Shoes"). People browsing, other runner
+profiles, following and any community surface remain out of scope.
+
+Style is a Concept Preview only: no apparel product DB, no apparel
+recommendation engine, no sizing, no commerce.
 
 Do not add a feature because it seems useful.
 

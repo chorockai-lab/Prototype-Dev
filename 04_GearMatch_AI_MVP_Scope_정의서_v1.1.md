@@ -14,16 +14,17 @@
 - 서비스명: **GearMatch AI**
 - 현재 단계: Prototype 완료 → Closed MVP 개발 준비
 - 기준 Prototype:
-  - `Prototype_GearMatch_AI_1.5_ShoeImages_Embedded(1).html`
+  - `Prototype_GearMatch_AI_1.7_RunnerIdentity.html` (정본)
+  - 이전 기준: `Prototype_GearMatch_AI_1.5_ShoeImages_Embedded.html` (v1.6 -> v1.7로 승계)
 - 기준 Product DB:
   - `product_db_v1.5`
 - Recommendation Rule:
   - `gear_reco_v1.1`
 - 상위 기준 문서:
   - `00_GearMatch_AI_Master_Context_v1.1.md`
-  - `01_GearMatch_AI_사업·서비스_정의서_v2.0.md`
-  - `02_GearMatch_AI_핵심_가설_및_검증_계획서_v1.0.md`
-  - `03_GearMatch_AI_타깃_사용자_및_JTBD_정의서_v1.0.md`
+  - `01_GearMatch_AI_사업·서비스_정의서_v2.1.md`
+  - `02_GearMatch_AI_핵심_가설_및_검증_계획서_v1.1.md`
+  - `03_GearMatch_AI_타깃_사용자_및_JTBD_정의서_v1.1.md`
 - 실행 연결 문서:
   - `05_GearMatch_AI_User_Flow_및_Service_Blueprint_v1.0.md`
   - `06_GearMatch_AI_데이터_기획서_v1.0.md`
