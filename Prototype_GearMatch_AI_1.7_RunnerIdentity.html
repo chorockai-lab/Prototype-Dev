@@ -302,6 +302,12 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 .gm-screen[data-screen="s06"]>.gm-card>div:nth-child(2){
   top:198px!important;
 }
+.gm-trend{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;margin-top:14px;height:118px}
+.gm-trend-col{display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;height:100%;gap:8px}
+.gm-trend-bar{display:block;width:100%;min-height:3px;height:3px;background:rgba(242,242,238,.2);transition:height .4s var(--ease-out)}
+.gm-trend-col.is-now .gm-trend-bar{background:var(--runner-accent)}
+.gm-trend-col small{font:400 10.5px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.04em;color:rgba(242,242,238,.5);text-align:center}
+.gm-insight-box{border-left:3px solid var(--runner-accent);padding:2px 0 2px 13px}
 .gm-share-card{position:relative;width:100%;height:520px;overflow:hidden;background:#111}
 .gm-share-photo{position:absolute;inset:0;background:#151515 center/cover no-repeat;display:flex;align-items:center;justify-content:center}
 .gm-share-photo-empty{font:600 13px/1.7 'Pretendard Variable',Pretendard,sans-serif;text-align:center;color:rgba(242,242,238,.4)}
@@ -1173,6 +1179,42 @@ html,body,.gm-screen,.type-reference{font-family:var(--font-ui)}
 <button data-action="runCardToHome" style="width:100%;border:1px solid rgba(242,242,238,.28);background:transparent;color:#f2f2ee;min-height:48px;margin-top:9px;display:flex;align-items:center;justify-content:center;font:600 13px 'Pretendard Variable',sans-serif">내 러닝에 저장하고 홈으로</button>
 </div>
 </div></section>
+<section class="gm-screen" data-screen="s18" id="screen-s18"><div class="dv-card gm-card" style="width:100%;height:880px;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
+<div style="display:flex;justify-content:space-between;padding:13px 18px 0;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.45)"><span>9:41</span><span>MY RUNNING</span><span>▮▮▮</span></div>
+<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 18px 0"><button data-action="backCard" style="justify-self:start;border:0;background:transparent;color:#f2f2ee;font:700 12px 'Pretendard Variable',sans-serif;padding:8px 0;opacity:.86">← 뒤로</button><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;letter-spacing:.22em">GEARMATCH AI</div><span></span></div>
+<div style="padding:26px 18px 0">
+<div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;letter-spacing:.22em;color:var(--runner-accent)">LAST 4 WEEKS</div>
+<div style="display:flex;align-items:baseline;gap:9px;margin-top:12px">
+<div class="gm-stat-number" data-role="insight-total" style="font-size:58px!important">0.0</div>
+<div style="font:700 15px 'Pretendard Variable',sans-serif;letter-spacing:.1em;color:rgba(242,242,238,.75)">KM</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);margin:20px 0 0;border-top:1px solid rgba(242,242,238,.16);border-bottom:1px solid rgba(242,242,238,.16)">
+<div style="padding:13px 0 13px 18px;border-right:1px solid rgba(242,242,238,.16)"><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;letter-spacing:.16em;color:rgba(242,242,238,.5)">RUNS</div><div class="gm-stat-number" data-role="insight-runs" style="font-size:26px!important;margin-top:7px">0</div></div>
+<div style="padding:13px 0 13px 14px;border-right:1px solid rgba(242,242,238,.16)"><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;letter-spacing:.16em;color:rgba(242,242,238,.5)">AVG</div><div class="gm-stat-number" data-role="insight-avg" style="font-size:26px!important;margin-top:7px">0.0</div></div>
+<div style="padding:13px 0 13px 14px"><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;letter-spacing:.16em;color:rgba(242,242,238,.5)">LONGEST</div><div class="gm-stat-number" data-role="insight-longest" style="font-size:26px!important;margin-top:7px">0.0</div></div>
+</div>
+<div style="padding:24px 18px 0">
+<div style="font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.16em;color:rgba(242,242,238,.5)">WEEKLY TREND</div>
+<div class="gm-trend" data-role="insight-trend">
+<div class="gm-trend-col"><span class="gm-trend-bar"></span><small>4주 전</small></div>
+<div class="gm-trend-col"><span class="gm-trend-bar"></span><small>3주 전</small></div>
+<div class="gm-trend-col"><span class="gm-trend-bar"></span><small>2주 전</small></div>
+<div class="gm-trend-col"><span class="gm-trend-bar"></span><small>이번 주</small></div>
+</div>
+</div>
+<div style="padding:22px 18px 0">
+<div class="gm-insight-box">
+<div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:11px;letter-spacing:.2em;color:var(--runner-accent)">INSIGHT</div>
+<p data-role="insight-copy" style="margin:9px 0 0;font:700 15px/1.6 'Pretendard Variable',sans-serif">아직 기록이 없어요.</p>
+<p data-role="insight-compare" style="margin:8px 0 0;font:400 12.5px/1.6 'Pretendard Variable',sans-serif;color:rgba(242,242,238,.65)"></p>
+</div>
+<p style="margin:12px 0 0;font:400 11.5px/1.6 'Pretendard Variable',sans-serif;color:rgba(242,242,238,.42)">GearMatch는 훈련을 처방하지 않아요. 내 러닝이 어떻게 달라지고 있는지만 보여드려요.</p>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;padding:0 18px 22px">
+<button data-action="toSimilar" style="width:100%;border:0;background:var(--runner-accent);color:#070707;min-height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:17px;font-weight:700;letter-spacing:-.025em">나 같은 러너들은 뭘 신고 달릴까?<span style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:13px">→</span></button>
+</div>
+</div></section>
 <section class="gm-screen" data-screen="s12" id="screen-s12"><div class="dv-card gm-card" style="width:100%;height:880px;background:#070707;color:#f2f2ee;position:relative;overflow:hidden">
 <div style="display:flex;justify-content:space-between;padding:13px 18px 0;font:400 12px 'Pretendard Variable',Pretendard,sans-serif;letter-spacing:.14em;color:rgba(242,242,238,.45)"><span>9:41</span><span>GEAR</span><span>▮▮▮</span></div>
 <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 18px 0"><button data-action="backCard" style="justify-self:start;border:0;background:transparent;color:#f2f2ee;font:700 12px 'Pretendard Variable',sans-serif;padding:8px 0;opacity:.86">← 뒤로</button><div style="font-family:'Pretendard Variable',Pretendard,sans-serif;font-size:12px;letter-spacing:.22em">GEARMATCH AI</div><span></span></div>
@@ -1435,7 +1477,7 @@ const TYPE_WEIGHTS=[
  ]
 ];
 const QUESTIONS=[{"text": "요즘 뛰러 나갈 때 제일 먼저 드는 생각은?", "field": "purpose", "options": [["오늘도 일단 뛰고 오자.", "HABIT"], ["요즘은 하나씩 더 해보고 싶다.", "MIXED"], ["오늘은 어디까지 가볼까?", "DISTANCE"], ["오늘 페이스는 어느 정도로 갈까?", "PERFORMANCE"], ["오늘도 목표에 맞춰 뛰어야지.", "RACE"]]}, {"text": "최근 한두 달, 내 러닝에서 가장 달라진 건?", "field": "trend", "options": [["크게 달라진 건 없이 꾸준히 뛰고 있다.", "SAME"], ["러닝에 쓰는 시간이나 관심이 더 커졌다.", "UP"], ["예전보다 오래, 멀리 뛰는 날이 많아졌다.", "UP"], ["페이스나 기록을 더 신경 쓰게 됐다.", "UP"], ["목표나 대회에 맞춰 훈련하기 시작했다.", "UP"]]}, {"text": "뛰고 나서 가장 기분 좋은 순간은?", "field": "purpose", "options": [["오늘도 안 빼먹고 뛰었다 싶을 때", "HABIT"], ["러닝이 점점 내 일상이 되는 것 같을 때", "HEALTH"], ["생각보다 더 멀리 갔을 때", "DISTANCE"], ["기록이 조금이라도 좋아졌을 때", "PERFORMANCE"], ["준비한 목표를 제대로 해냈을 때", "RACE"]]}, {"text": "주말에 러닝할 시간이 넉넉하다면 제일 하고 싶은 건?", "field": "purpose", "options": [["평소 코스를 편하게 한 번 뛰기", "HABIT"], ["안 해본 코스나 훈련 해보기", "MIXED"], ["평소보다 길게 달려보기", "DISTANCE"], ["짧게라도 템포 올려보기", "PERFORMANCE"], ["목표에 맞는 훈련 제대로 해보기", "RACE"]]}, {"text": "2~3개월 뒤, 어떤 변화가 제일 마음에 들 것 같아?", "field": "goal", "options": [["지금처럼 꾸준히 뛰는 흐름이 이어지는 것", "KEEP"], ["러닝을 지금보다 한 단계 더 넓혀가는 것", "UNKNOWN"], ["긴 거리가 더 자연스러워지는 것", "LONGER"], ["같은 거리를 조금이라도 더 빠르게 뛰는 것", "RECORD"], ["목표로 잡은 대회를 제대로 준비해 달리는 것", "RACE_PREP"]]}];
-const state={screen:'s01',questionIndex:0,answers:[null,null,null,null,null],distance:null,profile:{experience:null,runs:null,weekly:null,shoe:null,shoeStatus:null},typeResult:{coreType:null,scores:null},gearNeed:null,priority:null,followup:null,runDistance:8.4,run:{distance:null,timeText:null,paceText:null,photoUrl:null,dateISO:null,mood:'PERFORMANCE'},selectedRunShoe:'current',stats:{weeklyKm:0,weeklyRuns:0,shoeMileage:0,totalKm:0,lastRunKm:null}};
+const state={screen:'s01',questionIndex:0,answers:[null,null,null,null,null],distance:null,profile:{experience:null,runs:null,weekly:null,shoe:null,shoeStatus:null},typeResult:{coreType:null,scores:null},gearNeed:null,priority:null,followup:null,runDistance:8.4,run:{distance:null,timeText:null,paceText:null,photoUrl:null,dateISO:null,mood:'PERFORMANCE'},selectedRunShoe:'current',stats:{weeklyKm:0,weeklyRuns:0,shoeMileage:0,totalKm:0,lastRunKm:null},history:[],prevPeriodKm:null};
 let revealTimer=null, toastTimer=null;
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const reduced=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1450,6 +1492,7 @@ function show(sid){
   if(sid==='s08')updateProfileNext();
   if(sid==='s11')updateRunEntryView();
   if(sid==='s17')renderShareCard();
+  if(sid==='s18')renderInsight();
   if(sid==='s16')requestAnimationFrame(()=>el.scrollTo({top:0,behavior:'auto'}));
 }
 function updateProfileNext(){
@@ -1582,6 +1625,51 @@ function runInsightCopy(distance,before){
  if(diff<=-0.3)return '오늘은 최근 평균보다 '+Math.abs(diff).toFixed(1)+'km 짧게, 가볍게 달렸어요.';
  return '최근 평균과 비슷한 거리로 달린 날이에요.';
 }
+function seedHistory(pairs){const now=Date.now();return pairs.map(x=>({km:x[0],ts:now-x[1]*86400000}))}
+function weeklyBuckets(){
+ const now=Date.now(),km=[0,0,0,0],runs=[0,0,0,0];
+ (state.history||[]).forEach(r=>{
+  const days=Math.max(0,Math.floor((now-r.ts)/86400000));
+  if(days>=28)return;
+  const slot=3-Math.floor(days/7);
+  km[slot]+=r.km;runs[slot]+=1;
+ });
+ return{km,runs};
+}
+function insightSentence(count,b){
+ if(!count)return '아직 기록이 없어요. 오늘의 러닝을 남기면 여기에 변화가 쌓여요.';
+ if(count<3)return '아직 기록이 적어요. 두세 번만 더 쌓이면 나만의 흐름이 보이기 시작해요.';
+ const early=b.km[0]+b.km[1],late=b.km[2]+b.km[3],earlyRuns=b.runs[0]+b.runs[1],lateRuns=b.runs[2]+b.runs[3];
+ const best=Math.max.apply(null,b.km);
+ if(b.km[3]>0&&b.km[3]>=best)return '최근 4주 중 이번 주가 가장 많이 달린 주예요.';
+ if(late>early*1.1&&lateRuns<=earlyRuns)return '최근에는 러닝 횟수보다 한 번에 달리는 거리가 조금씩 늘고 있어요.';
+ if(lateRuns>earlyRuns)return '최근에는 한 번에 달리는 거리보다 달리는 횟수가 늘고 있어요.';
+ if(early>late*1.1)return '최근 2주는 그 전보다 조금 가볍게 달리고 있어요.';
+ return '최근 4주 동안 비슷한 리듬으로 꾸준히 달리고 있어요.';
+}
+function renderInsight(){
+ const root=$('#screen-s18');if(!root)return;
+ const hist=(state.history||[]).filter(r=>Date.now()-r.ts<28*86400000);
+ const total=hist.reduce((a,r)=>a+r.km,0),count=hist.length;
+ const longest=count?Math.max.apply(null,hist.map(r=>r.km)):0;
+ const b=weeklyBuckets(),peak=Math.max.apply(null,b.km.concat([1]));
+ const put=(role,val)=>{const el=$('[data-role="'+role+'"]',root);if(el)el.textContent=val};
+ put('insight-total',fmtKm(total));put('insight-runs',String(count));
+ put('insight-avg',count?fmtKm(total/count):'0.0');put('insight-longest',fmtKm(longest));
+ $$('.gm-trend-col',root).forEach((col,i)=>{
+  const bar=$('.gm-trend-bar',col);
+  if(bar)bar.style.height=Math.max(3,Math.round(b.km[i]/peak*96))+'px';
+  col.classList.toggle('is-now',i===3);
+ });
+ put('insight-copy',insightSentence(count,b));
+ const cmp=$('[data-role="insight-compare"]',root);
+ if(cmp){
+  if(state.prevPeriodKm&&count){
+   const diff=total-state.prevPeriodKm;
+   cmp.textContent=diff>=0?'그 전 4주보다 '+diff.toFixed(1)+'km 더 달렸어요.':'그 전 4주보다 '+Math.abs(diff).toFixed(1)+'km 적게 달렸어요.';
+  }else cmp.textContent='';
+ }
+}
 function renderShareCard(){
  const root=$('#screen-s17');if(!root)return;
  const card=$('[data-role="share-card"]',root);if(!card)return;
@@ -1695,8 +1783,8 @@ document.addEventListener('click',e=>{
  if(btn.dataset.coachChip){showCoachMock(btn.dataset.coachChip);return}
  const a=btn.dataset.action;if(!a)return;
  const A={
- startTest:()=>{state.questionIndex=0;state.answers=[null,null,null,null,null];state.distance=null;state.typeResult={coreType:null,scores:null};state.stats={weeklyKm:0,weeklyRuns:0,shoeMileage:0,totalKm:0,lastRunKm:null};state.selectedRunShoe='current';show('s03')},toIdentityCard:()=>show('s07'),openReturning:()=>show('s02'),backLanding:()=>show('s01'),loadExisting:()=>{state.answers=[3,3,3,3,3];state.distance='10K';state.profile={experience:'1~3년',runs:'주 3~4회',weekly:'15~30km',shoe:'Nike Pegasus 42',shoeStatus:null};state.stats={weeklyKm:18.2,weeklyRuns:3,shoeMileage:126,totalKm:284.6,lastRunKm:5.1};state.selectedRunShoe='current';evaluateType();show('s10');toast('Runner Card를 불러왔습니다.')},
- questionBack:()=>{if(state.screen==='s04'){state.questionIndex=3;show('s03')}else if(state.questionIndex>0){state.questionIndex--;renderQuestion()}else show('s01')},backQuestion5:()=>show('s04'),saveCard:()=>toast('카드 저장은 MVP에서 연결됩니다.'),shareCard:()=>toast('공유 기능은 MVP에서 연결됩니다.'),toProfile:()=>show('s08'),backCardLite:()=>show('s07'),profileNext:()=>{if(!state.profile.experience||!state.profile.runs||!state.profile.weekly){toast('러닝 경력·횟수·주간 거리를 선택해주세요.');return}show('s09')},profileBack:()=>show('s08'),profileComplete:()=>{if(!state.profile.shoe&&!state.profile.shoeStatus){toast('현재 러닝화 또는 해당 상태를 선택해주세요.');return}show('s10')},backProfile:()=>show('s09'),toGear:()=>show('s12'),toRun:()=>show('s11'),backCardComplete:()=>show('s10'),pickRunPhoto:()=>{const i=$('[data-role="run-photo-input"]');if(i)i.click()},saveRun:()=>{const n=runDistanceValue();if(!n){toast('러닝 거리를 입력해주세요.');return}const sec=parseRunTime(runFieldText('run-time'));if(!sec){toast('러닝 시간을 입력해주세요. 예: 42:18');return}updateRunPace();state.run.distance=n;state.run.timeText=fmtClock(sec);if(!state.run.dateISO)state.run.dateISO=todayISO();const before={...state.stats};state.runDistance=n;state.stats.weeklyKm=Number((state.stats.weeklyKm+n).toFixed(1));state.stats.weeklyRuns+=1;state.stats.totalKm=Number((state.stats.totalKm+n).toFixed(1));state.stats.lastRunKm=n;const shoeAdded=state.selectedRunShoe==='current'&&Boolean(state.profile.shoe);if(shoeAdded)state.stats.shoeMileage=Number((state.stats.shoeMileage+n).toFixed(1));const after={...state.stats};state.run.insight=runInsightCopy(n,before);state.run.feedback={distance:n,before,after,shoeAdded};show('s17')},backRunEntry:()=>show('s11'),shareRunCard:()=>toast('공유 기능은 MVP에서 연결됩니다.'),runCardToHome:()=>{const f=state.run.feedback;show('s10');if(f)setTimeout(()=>showRunFeedback(f.distance,f.before,f.after,f.shoeAdded),90)},backCard:()=>show('s10'),gearQuestion:()=>toast('자유 질문은 AI Gear Coach에서 연결됩니다.'),gearNeedNext:()=>{if(!state.gearNeed){toast('장비 목적을 하나 골라주세요.');return}show('s13')},backGearNeed:()=>show('s12'),priorityNext:()=>{if(!state.priority){toast('우선순위를 하나 골라주세요.');return}if(state.gearNeed==='아직 잘 모르겠어요')show('s14');else if(!state.profile.weekly)show('s15');else show('s16')},backPriority:()=>show('s13'),followupNext:()=>{if(!state.followup){toast('한 가지를 골라주세요.');return}if(!state.profile.weekly)show('s15');else show('s16')},toRecommendation:()=>{if(!state.profile.weekly){toast('주간 거리를 하나 골라주세요.');return}show('s16')},backRecommendation:()=>show('s13'),editCriteria:()=>show('s12'),sendCoach:()=>{showCoachMock('지금 신발과 뭐가 달라?');toast('예시 답변을 보여드렸어요.')},restart:()=>{location.reload()}
+ startTest:()=>{state.questionIndex=0;state.answers=[null,null,null,null,null];state.distance=null;state.typeResult={coreType:null,scores:null};state.stats={weeklyKm:0,weeklyRuns:0,shoeMileage:0,totalKm:0,lastRunKm:null};state.history=[];state.prevPeriodKm=null;state.run={distance:null,timeText:null,paceText:null,photoUrl:null,dateISO:null,mood:'PERFORMANCE'};state.selectedRunShoe='current';show('s03')},toIdentityCard:()=>show('s07'),openReturning:()=>show('s02'),backLanding:()=>show('s01'),loadExisting:()=>{state.answers=[3,3,3,3,3];state.distance='10K';state.profile={experience:'1~3년',runs:'주 3~4회',weekly:'15~30km',shoe:'Nike Pegasus 42',shoeStatus:null};state.stats={weeklyKm:18.2,weeklyRuns:3,shoeMileage:126,totalKm:284.6,lastRunKm:5.1};state.history=seedHistory([[5.1,1],[6.8,3],[6.3,6],[8.2,9],[5.4,12],[7.1,15],[10.4,18],[6.0,22],[5.9,25]]);state.prevPeriodKm=58.6;state.selectedRunShoe='current';evaluateType();show('s10');toast('Runner Card를 불러왔습니다.')},
+ questionBack:()=>{if(state.screen==='s04'){state.questionIndex=3;show('s03')}else if(state.questionIndex>0){state.questionIndex--;renderQuestion()}else show('s01')},backQuestion5:()=>show('s04'),saveCard:()=>toast('카드 저장은 MVP에서 연결됩니다.'),shareCard:()=>toast('공유 기능은 MVP에서 연결됩니다.'),toProfile:()=>show('s08'),backCardLite:()=>show('s07'),profileNext:()=>{if(!state.profile.experience||!state.profile.runs||!state.profile.weekly){toast('러닝 경력·횟수·주간 거리를 선택해주세요.');return}show('s09')},profileBack:()=>show('s08'),profileComplete:()=>{if(!state.profile.shoe&&!state.profile.shoeStatus){toast('현재 러닝화 또는 해당 상태를 선택해주세요.');return}show('s10')},backProfile:()=>show('s09'),toGear:()=>show('s12'),toRun:()=>show('s11'),backCardComplete:()=>show('s10'),pickRunPhoto:()=>{const i=$('[data-role="run-photo-input"]');if(i)i.click()},saveRun:()=>{const n=runDistanceValue();if(!n){toast('러닝 거리를 입력해주세요.');return}const sec=parseRunTime(runFieldText('run-time'));if(!sec){toast('러닝 시간을 입력해주세요. 예: 42:18');return}updateRunPace();state.run.distance=n;state.run.timeText=fmtClock(sec);if(!state.run.dateISO)state.run.dateISO=todayISO();const before={...state.stats};state.runDistance=n;state.stats.weeklyKm=Number((state.stats.weeklyKm+n).toFixed(1));state.stats.weeklyRuns+=1;state.stats.totalKm=Number((state.stats.totalKm+n).toFixed(1));state.stats.lastRunKm=n;const shoeAdded=state.selectedRunShoe==='current'&&Boolean(state.profile.shoe);if(shoeAdded)state.stats.shoeMileage=Number((state.stats.shoeMileage+n).toFixed(1));const after={...state.stats};state.history.push({km:n,ts:Date.parse((state.run.dateISO||todayISO())+'T12:00:00')||Date.now()});state.run.insight=runInsightCopy(n,before);state.run.feedback={distance:n,before,after,shoeAdded};show('s17')},backRunEntry:()=>show('s11'),toInsight:()=>show('s18'),toSimilar:()=>show('s19'),shareRunCard:()=>toast('공유 기능은 MVP에서 연결됩니다.'),runCardToHome:()=>{const f=state.run.feedback;show('s10');if(f)setTimeout(()=>showRunFeedback(f.distance,f.before,f.after,f.shoeAdded),90)},backCard:()=>show('s10'),gearQuestion:()=>toast('자유 질문은 AI Gear Coach에서 연결됩니다.'),gearNeedNext:()=>{if(!state.gearNeed){toast('장비 목적을 하나 골라주세요.');return}show('s13')},backGearNeed:()=>show('s12'),priorityNext:()=>{if(!state.priority){toast('우선순위를 하나 골라주세요.');return}if(state.gearNeed==='아직 잘 모르겠어요')show('s14');else if(!state.profile.weekly)show('s15');else show('s16')},backPriority:()=>show('s13'),followupNext:()=>{if(!state.followup){toast('한 가지를 골라주세요.');return}if(!state.profile.weekly)show('s15');else show('s16')},toRecommendation:()=>{if(!state.profile.weekly){toast('주간 거리를 하나 골라주세요.');return}show('s16')},backRecommendation:()=>show('s13'),editCriteria:()=>show('s12'),sendCoach:()=>{showCoachMock('지금 신발과 뭐가 달라?');toast('예시 답변을 보여드렸어요.')},restart:()=>{location.reload()}
  };if(A[a])A[a]();
 });
 show('s01');
