@@ -5,8 +5,8 @@
 > 각 단계에서 시스템이 어떤 데이터를 저장·처리하며, 어떤 Event를 기록해야 하는지 정의한다.  
 > Prototype의 현재 화면 흐름을 기반으로 하되, `04_MVP Scope 정의서`의 P0 기능을 실제 서비스 흐름으로 전환하는 것을 목표로 한다.
 
-- 문서 버전: v1.0
-- 기준 시점: 2026-09-04
+- 문서 버전: v1.0 (2026-09-21 Prototype v1.7 반영 개정)
+- 기준 시점: 2026-09-04 / 개정 2026-09-21
 - 서비스 정식 명칭: **GearMatch AI**
 - 상위 기준 문서:
   - `00_GearMatch_AI_Master_Context_v1.1`
@@ -113,6 +113,9 @@ MVP에서는 Recommendation 정확도를 높이기 위해
 
 MVP의 기본 진입 흐름은 **Identity First**다.
 
+> **2026-09-21 개정 (Prototype v1.7).** Gear Recommendation은 없어지지 않고 **뒤로 이동**했다.
+> 반복 경험의 축은 `RUN → EXPRESS → DISCOVER → UNDERSTAND → EXPLORE`다.
+
 ```text
 [Landing]
    ↓
@@ -124,36 +127,52 @@ MVP의 기본 진입 흐름은 **Identity First**다.
    ↓
 [5 Questions]
    ↓
-[Runner Type Reveal]
+[Runner Identity Reveal]      ← WHY THIS IS YOU 근거 제시, 자동 전환 없음
    ↓
-[Runner Card Lite]
+[Runner ID Card]
    ↓
 [Runner Profile]
    ↓
 [Current Shoe]
    ↓
-[Runner Card Complete]
+[Today's Run]                 ← 사진 + 거리 + 시간 (Pace 자동)
    ↓
- ┌────────────┬─────────────┐
- │            │             │
-[RUN 기록]   [GEAR 탐색]   [Card 확인]
- │            │
- ↓            ↓
-Activity     Gear Need
-Update        ↓
- │          Priority
- ↓            ↓
-Card Update  Follow-up if needed
-              ↓
-         3 Gear Directions
-              ↓
-         Product Candidates
-              ↓
-       Recommendation Reason
-              ↓
-      Purchase Consideration
-              ↓
-          Feedback
+[Today's Run Share Card]      ← 사진이 메인, Visual Mood 선택
+   ↓
+[Home / My Running]
+   ↓
+ ┌──────────────┬──────────────┬──────────────┐
+ │              │              │              │
+[Recent Run]  [Running     [Runners Like   [Gear Explore]
+ + 새 러닝      Insight]      You — Shoes]         │
+ │              │              │                  ↓
+ ↓              ↓              ↓              Gear Need
+Today's Run   최근 4주 추이   Shoes / Style        ↓
+ │                                            Priority
+ ↓                                                ↓
+Share Card                                 Follow-up if needed
+                                                  ↓
+                                          3 Gear Directions
+                                                  ↓
+                                          Product Candidates
+                                                  ↓
+                                        Recommendation Reason
+                                                  ↓
+                                       Purchase Consideration
+                                                  ↓
+                                              Feedback
+```
+
+## 재방문 Home 우선순위
+
+기존 사용자에게 Runner Test를 다시 보여주지 않는다.
+
+```text
+1. RECENT RUN
+2. MY RUNNING INSIGHT
+3. MY RUNNER IDENTITY
+4. RUNNERS LIKE YOU
+5. GEAR EXPLORE
 ```
 
 ---
@@ -194,13 +213,16 @@ Gear Need
 | Runner Card Lite | s07 | Identity 결과 |
 | Profile | s08 | 러닝 경력 / 횟수 / 거리 |
 | Current Shoe | s09 | 현재 러닝화 |
-| Runner Card Complete | s10 | Activity + Gear 허브 |
-| Run Add | s11 | 수기 러닝 입력 |
-| Gear Need | s12 | 장비 탐색 목적 |
+| Home / My Running | s10 | 재방문 허브 — Recent Run · Insight · Identity · Runners Like You · Gear |
+| Today's Run | s11 | 수기 러닝 입력 (사진 · 거리 · 시간 · Pace 자동 · 날짜) |
+| Gear Need | s12 | 지금의 러닝에서 바꾸고 싶은 것 (자유입력은 보조) |
 | Gear Priority | s13 | 우선순위 |
 | Follow-up | s14 | 필요한 경우 추가 질문 |
 | Missing Weekly Distance | s15 | Context 보완 |
 | Gear Recommendation | s16 | 3 Directions + Product |
+| Today's Run Share Card | s17 | Photo-first 공유 카드 + Visual Mood |
+| Running Insight | s18 | 최근 4주 추이 + 한 줄 해석 |
+| Runners Like You | s19 | Shoes(P0) / Style(Concept Preview) |
 
 MVP 개발 시 Screen ID 자체는 변경 가능하지만  
 **Flow의 의미는 유지**한다.
@@ -387,14 +409,29 @@ Answers
 
 ## 목적
 
-결과를 바로 Card로 보여주기 전에  
-짧은 Reveal을 통해 기대감을 만든다.
+이 화면은 **첫 번째 Wow Moment**다. 사용자가 2~3초 안에
+"어? 이거 나 같은데?"라고 느낄 수 있어야 한다.
+
+> **2026-09-21 개정 (Prototype v1.7).** 짧은 트랜지션에서 **독립 화면으로 승격**했다.
+> 자동 전환하지 않고 사용자가 읽고 넘어간다.
 
 ## 화면
 
 - Type Name
 - Visual Transition
-- 짧은 결과 노출
+- Type 정의 한 줄
+- **WHY THIS IS YOU** — 5문항 답변에서 뽑은 근거 3~4줄
+- 다음 단계 CTA (자동 전환 없음)
+
+근거는 사용자가 고른 답을 짧은 구절로 되돌려준다.
+
+```text
+WHY THIS IS YOU
+
+페이스와 기록에 민감
+페이스·기록 관심이 증가
+같은 거리를 조금이라도 빠르게
+```
 
 ## Event
 
@@ -462,15 +499,20 @@ Reward First
 
 ## P0
 
-**“내 Runner Profile 완성하기”**
+**"내 Runner Profile 완성하기"**
+
+Secondary: **"건너뛰고 오늘의 러닝 남기기"**
+
+> **2026-09-21 개정 (Prototype v1.7).** Secondary CTA를 "건너뛰고 장비 추천 보기"에서
+> "건너뛰고 오늘의 러닝 남기기"로 바꿨다. Runner ID Card 다음 단계는 Gear가 아니라
+> Today's Run이다.
 
 ## P1
 
 - 카드 저장
 - 카드 공유
 
-MVP 초기 P0 검증에서는  
-Save/Share가 없어도 다음 단계로 이동 가능해야 한다.
+MVP 초기 P0 검증에서는 Save/Share가 없어도 다음 단계로 이동 가능해야 한다.
 
 ---
 

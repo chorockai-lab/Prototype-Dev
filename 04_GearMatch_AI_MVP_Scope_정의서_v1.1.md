@@ -9,8 +9,8 @@
 > 따라서 본 문서는 “좋아 보이는 기능 목록”이 아니라  
 > **가설 검증에 필요한 최소 제품 범위**를 정의한다.
 
-- 문서 버전: v1.1
-- 기준 시점: 2026-09-04
+- 문서 버전: v1.1 (2026-09-21 Prototype v1.7 반영 개정)
+- 기준 시점: 2026-09-04 / 개정 2026-09-21
 - 서비스명: **GearMatch AI**
 - 현재 단계: Prototype 완료 → Closed MVP 개발 준비
 - 기준 Prototype:
@@ -160,10 +160,13 @@ Runner Card
 Nickname + PIN
 Runner Profile
 Current Shoe 1개
-Run Add
-Activity Summary
+Today's Run (수동 입력 · 거리 · 시간 · Pace 자동 · 날짜)
+Today's Run Photo (1장)
+Today's Run Share Card (Photo-first)
+Running Insight (최근 4주)
 Shoe Mileage
 Runner Home
+Runners Like You — Shoes
 Gear Need
 Priority
 3 Gear Directions
@@ -184,8 +187,11 @@ QA / Release
 ## P1
 
 ```text
-Runner Card Save
-Runner Card Share
+Runner ID Card Save
+Runner ID Card Share
+
+Visual Mood (Share Card 표현 4종)
+Style Concept Preview (Mock)
 
 Product Save
 External Product Link
@@ -209,8 +215,8 @@ Multi-shoe
 Shoe Rotation
 
 Other Runner Profile
-Similar Runner
 Runner Discovery
+Similar Runner — People / Activity 탐색
 
 Community
 Follow
@@ -272,6 +278,12 @@ Returning User
 - New User CTA
 - Returning User Entry
 - KR / EN 구조 고려
+
+> **2026-09-21 개정 (Prototype v1.7).** Landing의 첫 번째 약속은 Gear 추천이 아니다.
+> 「나는 어떤 러너일까? / 내 러닝 스타일을 발견하고 오늘의 러닝을 나답게 기록해보세요」가 Hero다.
+> 지표 스트립은 `05 QUESTIONS / 01 RUNNER ID / TODAY RUN & SHARE`이며,
+> `03 GEAR OPTIONS`는 첫인상이 다시 러닝화 추천으로 고정되므로 쓰지 않는다.
+> Gear는 CTA 바로 위 보조 문구("나와 비슷한 러너가 무엇을 신고 뛰는지도 확인할 수 있어요")로만 언급한다.
 
 ---
 
@@ -394,12 +406,24 @@ Profile과 Current Shoe 이후:
 
 를 보여준다.
 
+> **2026-09-21 개정 (Prototype v1.7).** 재방문 Home의 우선순위를 아래로 고정한다.
+> 기존 사용자에게 Runner Test를 다시 보여주지 않는다.
+
+```text
+1. RECENT RUN        최근 러닝 거리 / 시간 / Pace + [오늘의 Run Card 만들기]
+2. MY RUNNING INSIGHT 최근 4주 총거리 / 횟수 / 평균 + 한 줄 해석
+3. MY RUNNER IDENTITY Runner Type 카드 (기존 Runner Card Visual 유지)
+4. RUNNERS LIKE YOU   나와 비슷한 러너가 쓰는 Shoes
+5. GEAR EXPLORE       "새로운 장비가 궁금해졌나요?" — 보조 버튼
+```
+
 Primary CTA:
 
 ```text
-+ RUN
-EXPLORE GEAR
+오늘의 Run Card 만들기
 ```
+
+Gear는 홈의 첫 번째 콘텐츠가 아니다. Secondary CTA로 내린다.
 
 ---
 
@@ -494,17 +518,35 @@ Recommendation에서:
 
 ---
 
-# 24. P0 — Activity
+# 24. P0 — Activity (Today's Run)
 
-Manual Run Add.
+Manual Run Add. **자동 연동은 MVP 범위 밖이다** (Strava / NRC / Garmin / Apple Health, OCR 포함).
+단, UI에서 향후 연동 가능성은 작은 보조 문구로 보여줄 수 있다.
 
-Input:
+Input (필수):
 
 ```text
-date
 distance_km
+duration
+```
+
+Input (선택):
+
+```text
+date          기본값 오늘
+photo         1장, Browser Object URL Preview로 충분
 current_shoe
 ```
+
+Derived:
+
+```text
+pace          distance_km + duration으로 자동 계산
+```
+
+> **2026-09-21 개정 (Prototype v1.7).** `duration` / `pace` / `photo`가 추가됐다.
+> 사진은 Today's Run Share Card의 메인 Visual이므로 P0다.
+> 입력 화면은 전문 Training Log처럼 보이지 않게 한다.
 
 ---
 
@@ -516,6 +558,22 @@ weekly_runs
 total_km
 last_run
 ```
+
+Running Insight (최근 4주, **분석 수준은 B로 제한**):
+
+```text
+recent_4w_km
+recent_4w_runs
+recent_4w_avg_km
+recent_4w_longest_km
+weekly_trend       주차별 4개 구간
+prev_period_delta  이전 4주 대비 간단 비교
+```
+
+한 줄 Insight를 함께 제시한다. 사용자가 숫자를 해석하게 두지 않는다.
+
+하지 않는 것: VO2max 추정 / 부상 위험 진단 / Recovery 진단 / Training Plan 자동 생성 /
+전문 운동 처방. GearMatch는 Strava · Garmin을 복제하지 않는다.
 
 ---
 
@@ -1290,20 +1348,65 @@ Activity Retention이 확인되면 검토.
 
 ---
 
-# 83. P2 — Similar Runner
+# 83. P0 — Similar Runner (Gear Discovery 한정)
 
-중요한 장기 방향.
+> **2026-09-21 개정 (D-09).** Prototype v1.7에서 Similar Runner를 P2에서 **P0 전용 화면**으로 올렸다.
+> 단, 올라온 것은 **Gear Discovery**뿐이다. 사람 탐색은 그대로 P2다.
 
-하지만 현재는 First-party Experience Data가 부족하다.
+첫 화면의 질문은 이것이다.
+
+```text
+나 같은 러너들은 뭘 신고 달릴까?
+```
+
+## P0 범위
+
+- 나와 조건이 비슷한 러너들이 사용 중인 **Shoes** 목록
+- 비교 기준 노출: 주간 거리 / 목표 거리 / Runner Type / 현재 신발
+- 제품별 한 줄 사용 맥락 + 간단한 Gear 특징
+
+## P0가 아닌 것
+
+- 사람 목록 / Other Runner Profile / Follow / Reaction
+- Similarity Score 숫자 노출
+
+## 표현 규칙
+
+초기 Seed Data가 작다는 점을 전제한다.
+
+금지:
+
+```text
+93% MATCH
+87% SATISFACTION
+```
+
+권장:
+
+```text
+주간 거리와 10K 목표가 비슷한 러너들이 사용 중인 Shoes
+현재 패널에서 나와 조건이 비슷한 러너들이 사용하는 장비
+```
 
 ---
 
 # 84. Similar Runner의 장기 역할
 
+확장 순서는 아래를 따른다.
+
+```text
+GEAR
+→ ACTIVITY
+→ PEOPLE
+→ COMMUNITY
+```
+
 ```text
 Recommendation Evidence
 +
-Social Discovery
+Gear Discovery
++
+Social Discovery (장기)
 ```
 
 ---
