@@ -44,16 +44,22 @@ Runner Identity → Runner Card → 러닝·장비 데이터 → 나에게 맞�
 | **UI (현재)** | 전문적이고 갖고 싶어 보이는가 |
 | MVP | 실제로 쓸 만한가 |
 
-핵심 플로우: 랜딩 → 5문항 → (조건부 관심 거리) → Runner Card(잠정) → 프로필 2스텝 → Runner Card(확정) → RUN 추가 → Gear Need/Priority → 3 Gear Directions → Gear Coach.
+핵심 플로우 (Prototype v1.7): 랜딩 → 5문항 → (조건부 관심 거리) → Runner Identity Reveal →
+Runner ID Card → 프로필 2스텝 → Today's Run(사진·거리·시간) → Today's Run Share Card →
+Home(Recent Run / Running Insight / Identity / Runners Like You) → Gear Need/Priority →
+3 Gear Directions → Gear Coach.
+
+반복 경험의 축은 `RUN → EXPRESS → DISCOVER → UNDERSTAND → EXPLORE`이며,
+Gear는 폐기되지 않고 Identity · Activity · Expression 뒤에 온다.
 
 ## Capabilities and Constraints
 
 **확정 규칙 (`docs/DECISIONS.md`)**
 
-- `TYPE_RULE_v0.1` — Core Type 5종(`RHYTHM_MAKER` / `MOMENTUM_BUILDER` / `DISTANCE_ARCHITECT` / `PACE_TACTICIAN` / `VERSATILE_EXPLORER`) + Modifier 4종(`COMFORT_FIRST` / `SPEED_CURIOUS` / `DISTANCE_UP` / `RACE_READY`). 단일 질문으로 Type을 결정하지 않는다.
-- `REC_v0.1` — Filter / Score / Trade-off / Caution 3단계. Caution은 제품 고정값이 아니라 사용자 Context × 제품 속성으로 런타임 결정하며, **WARN 등급은 카드 `WATCH` 영역에 필수 노출**한다(접힌 영역에 두지 않는다). (D-06)
-- `SIM_v0.1` — Similar Runner는 독립 화면이 아니라 추천 카드 내부의 Evidence. Similarity Score 숫자는 사용자에게 노출하지 않는다. (D-02)
-- `PDB_v0.2` — Product DB SSOT는 `seed/products.v0.2.json`.
+- `TYPE_RULE_v0.1` — **Runner Type 6종**(`ROUTINE_RUNNER` / `EXPLORE_RUNNER` / `DISTANCE_RUNNER` / `PACE_RUNNER` / `RACE_RUNNER` / `ALL_AROUND_RUNNER`). 앞 5종이 Core Persona고 `ALL_AROUND_RUNNER`는 점수가 몰릴 때 나오는 판정 결과다. 단일 질문으로 Type을 결정하지 않는다. (D-09로 5종+Modifier 체계를 대체. GM-031 착수 시 `TYPE_RULE_v0.2`로 올린다)
+- `gear_reco_v1.1` — Filter / Score / Trade-off / Caution 3단계. Caution은 제품 고정값이 아니라 사용자 Context × 제품 속성으로 런타임 결정하며, **WARN 등급은 카드 `WATCH` 영역에 필수 노출**한다(접힌 영역에 두지 않는다). (D-06)
+- `SIM_v0.1` — Similar Runner는 **P0 독립 화면(Gear Discovery)** 이면서 추천 카드 내부 Evidence이기도 하다. 사람 탐색·프로필은 P2. Similarity Score 숫자는 사용자에게 노출하지 않으며 `93% MATCH` 같은 표현도 쓰지 않는다. (D-02 → D-09로 갱신)
+- `product_db_v1.5` — Product DB SSOT는 `10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx`. `seed/products.v0.2.json`은 구 `PDB_v0.2` 산출물이며 재생성이 필요하다. (D-08 → D-09로 갱신)
 - Rule을 변경하면 반드시 Version을 올린다. 과거 추천 화면을 재현할 수 없게 되는 것이 가장 큰 손실이다.
 
 **개발 원칙**
