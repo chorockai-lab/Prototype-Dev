@@ -675,6 +675,10 @@ Retention Reminder Experiment
 
 # 29. P2 / Post-MVP
 
+> **2026-09-22 개정 (D-09 / Prototype v1.7).** `Similar Runner` 를 목록에서 뺐다.
+> **Gear Discovery 한정으로 P0** 가 됐기 때문이다 (v1.7 `RUNNERS LIKE YOU` 화면).
+> 사람 탐색(`Other Runner Profile`, `Runner Discovery`)과 Community는 그대로 P2다.
+
 ```text
 Avatar
 Card Customization
@@ -685,7 +689,6 @@ Multi-shoe
 Shoe Rotation
 
 Other Runner Profile
-Similar Runner
 Runner Discovery
 
 Community
@@ -1631,9 +1634,32 @@ Personal Data
 
 # 83. Similar Runner
 
-MVP P0가 아니다.
+> **2026-09-22 개정 (D-09 / Prototype v1.7).** 기존 서술은 "MVP P0가 아니다" 였다.
+> Prototype v1.7에서 **Gear Discovery 한정으로 P0** 가 됐다.
 
-장기 역할은 두 가지다.
+## P0 범위 — Gear Discovery
+
+v1.7 `RUNNERS LIKE YOU` 화면이 답하는 질문은 하나다.
+
+> 나 같은 러너들은 뭘 신고 달릴까?
+
+나와 주간 거리·목표가 비슷한 러너들이 사용 중인 Shoes를 보여준다.
+비교 기준(주간 거리 / 목표 거리 / Runner Type / 현재 신발)을 함께 노출한다.
+
+## P0가 아닌 것
+
+사람 목록, Other Runner Profile, Follow, Reaction 등 Community는 그대로 P2다.
+
+확장 순서는 다음을 따른다.
+
+```text
+GEAR
+→ ACTIVITY
+→ PEOPLE
+→ COMMUNITY
+```
+
+## 장기 역할은 두 가지다
 
 ## Recommendation Evidence
 
