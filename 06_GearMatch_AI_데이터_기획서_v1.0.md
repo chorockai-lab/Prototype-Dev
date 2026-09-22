@@ -10,11 +10,11 @@
 - 기준 시점: 2026-09-04
 - 서비스 정식 명칭: **GearMatch AI**
 - 상위 기준 문서:
-  - `00_GearMatch_AI_Master_Context_v1.0`
-  - `01_GearMatch_AI_사업·서비스_정의서_v2.0`
-  - `02_GearMatch_AI_핵심_가설_및_검증_계획서_v1.0`
-  - `03_GearMatch_AI_타깃_사용자_및_JTBD_정의서_v1.0`
-  - `04_GearMatch_AI_MVP_Scope_정의서_v1.0`
+  - `00_GearMatch_AI_Master_Context_v1.1`
+  - `01_GearMatch_AI_사업·서비스_정의서_v2.1`
+  - `02_GearMatch_AI_핵심_가설_및_검증_계획서_v1.1`
+  - `03_GearMatch_AI_타깃_사용자_및_JTBD_정의서_v1.1`
+  - `04_GearMatch_AI_MVP_Scope_정의서_v1.1`
   - `05_GearMatch_AI_User_Flow_및_Service_Blueprint_v1.0`
 - 현재 단계: Prototype 완료 → MVP 데이터 구조 확정
 - 핵심 가설:
@@ -1996,6 +1996,10 @@ User
 ---
 
 # 121. Future Data Expansion — Similar Runner
+
+> **2026-09-21 개정 (D-09 / Prototype v1.7).** Similar Runner의 **Gear Discovery는 이미 P0**다
+> (v1.7 `RUNNERS LIKE YOU` 화면). 아래 "Future"는 **사람 탐색 · Activity 비교 · Community**로 이어지는
+> 심화 확장을 가리킨다. 확장 순서는 GEAR → ACTIVITY → PEOPLE → COMMUNITY다.
 
 필요 데이터 후보:
 

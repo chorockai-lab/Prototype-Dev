@@ -192,6 +192,15 @@ components:
 
 # Design System: GearMatch AI
 
+> ⚠️ **이 문서는 「레인 배정」 디자인 시스템 — archive `v1.2` 계열의 비주얼 월드다.**
+> 
+> 2026-09-21 `docs/DECISIONS.md` **D-09** 판정에 따라 정본 비주얼은
+> **라임/다크 `#D7FF2E` 계열의 `Prototype_GearMatch_AI_1.7_RunnerIdentity.html`** 이다.
+> 이 문서의 트랙 적갈색 `#A63D25` · Archivo · Core Type 5종 레인 컬러는 **정본이 아니다.**
+> 
+> 폐기하지 않고 보관하는 이유: 색·타이포·컴포넌트 토큰의 설계 근거와 Named Rules가
+> 앞으로도 참고 가치가 있기 때문이다. **새 화면의 기준으로는 쓰지 않는다.**
+
 ## Overview
 
 **Creative North Star: "레인 배정 (Lane Assignment)"**
@@ -222,7 +231,7 @@ components:
 - **Signal Amber** (`#F5B722`): 계측 신호. 섹션 라벨, 현재 진행 구간, 링크성 액션. 면으로 쓰지 않는다.
 
 ### Tertiary — Core Type 레인 컬러
-Runner Type 5종에 각각 배정된 레인 색. 카드 좌측 스트라이프와 액센트에만 쓴다.
+Runner Type **5종 체계 기준**(구 D-01)으로 배정된 레인 색. 카드 좌측 스트라이프와 액센트에만 쓴다.
 - **Rhythm Green** (`#2E7D5B`) / **Momentum Orange** (`#C6521E`) / **Distance Blue** (`#1F6FA8`) / **Pace Red** (`#B4362B`) / **Versatile Violet** (`#6B5AA6`)
 
 ### Neutral

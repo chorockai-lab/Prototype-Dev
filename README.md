@@ -61,7 +61,21 @@ Recommendation DB는 추천 로직의 기준 데이터로 사용합니다.
 
 ### Prototype
 
-- `Prototype_GearMatch_AI_...html`
+**Current Prototype**
+
+Latest:
+- v1.7 Runner Identity — `Prototype_GearMatch_AI_1.7_RunnerIdentity.html`
+
+Previous:
+- v1.6 UX Clarity — `Prototype_GearMatch_AI_1.6_UXClarity.html`
+- v1.5 Shoe Images Embedded — `Prototype_GearMatch_AI_1.5_ShoeImages_Embedded.html`
+
+Tags:
+- `prototype-v1.6`
+- `prototype-v1.7` (main merge 후 생성)
+
+버전별 변경 내역은 `CHANGELOG.md`를 확인합니다.
+이전 버전 파일은 덮어쓰지 않고 그대로 보존합니다.
 
 현재 Prototype은 MVP의 **User Flow / UI / Interaction 기준**으로 사용합니다.
 
@@ -88,17 +102,28 @@ Claude Code는 작업 전 `CLAUDE.md`를 가장 먼저 확인합니다.
 | `docs/DECISIONS.md` | 기획 문서 간 충돌 해소 기록 (D-01~D-09) |
 | `docs/UX_Prototype_Fix_Plan_v1.0.md` | UX 개선 계획 |
 | `docs/superpowers/` | 프로토타입 제작 당시 plan / spec 기록 |
-| `seed/products.v0.2.json` | Product DB `PDB_v0.2` 정규화 산출물 (제품 61 · Evidence 397) |
+| `seed/products.v1.5.json` | Product DB `product_db_v1.5` 정규화 산출물 (제품 35 · Eligible 10 · Evidence 80) |
 | `scripts/seed/` | xlsx → JSON 변환 및 검증 파이프라인 (`GM-060` 선행 구현) |
+| `archive/seed/products.v0.2.json` | 구 `PDB_v0.2` 산출물 (보관본) |
 | `src/domain/shared/vocabulary.ts` | 도메인 용어 · Rule Version 상수 |
-| `archive/` | 프로토타입 v1.2 및 보관 규칙 |
+| `archive/` | 프로토타입 v1.2 및 보관 규칙 (보관본) |
 
-> ⚠️ **정본 판정 보류.** `archive/`의 프로토타입 v1.2와 루트의 v1.5는 비주얼 월드도
-> Runner Type 체계(5종 vs 6종)도 다릅니다. 판정 전까지 **신규 구현은 `CLAUDE.md`가
-> 지정한 v1.5와 최신 기획서를 따릅니다.** 상세는 `docs/DECISIONS.md` D-09 참조.
+> ✅ **정본 판정 완료 (2026-09-21).** 정본은 **레포 최신 기획서 + `Prototype v1.7`** 계열입니다.
+> Runner Type은 **6종**으로 확정했고, Current Shoe는 **Active 1개**, Product DB SSOT는 **`10-A v1.5`** 입니다.
+> `archive/`의 v1.2와 루트의 v1.5 / v1.6은 보관본이며 새 구현의 기준으로 쓰지 않습니다.
+> 상세는 `docs/DECISIONS.md` D-09 참조.
 
-`scripts/seed/`는 `PDB_v0.2` xlsx를 대상으로 작성되어 있어, 현재 `10-A v1.5`에 맞춰
-갱신이 필요합니다.
+`scripts/seed/`는 2026-09-22에 `10-A v1.5` 기준으로 재작성했습니다.
+
+```bash
+npm install
+npm run seed:build    # 10-A v1.5 xlsx -> seed/products.v1.5.json
+npm run seed:verify   # 정합성 검증 게이트
+```
+
+> 워크북 XML에 `x:` 네임스페이스 접두가 붙어 있어 ExcelJS로는 읽히지 않습니다.
+> 파서를 SheetJS로 교체했고, 패치 버전을 쓰기 위해 공식 CDN 타르볼로 고정했습니다.
+> 설치 시 `cdn.sheetjs.com` 접근이 필요합니다.
 
 ---
 
