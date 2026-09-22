@@ -1724,12 +1724,18 @@ Sponsored
 
 # 87. Service Expansion
 
+> **2026-09-22 개정 (D-09 / Prototype v1.7).** `Similar Runner` 의 Gear Discovery를
+> Stage 2에서 Stage 1로 옮겼다. v1.7에서 이미 P0 화면으로 들어왔기 때문이다.
+> Stage 2에 남은 것은 Activity 비교이고, People은 그대로 Stage 3다.
+
 ## Stage 1
 
 ```text
 Runner Identity
 +
 Activity
++
+Similar Runner (Gear Discovery)
 +
 Running Shoe Recommendation
 ```
@@ -1745,7 +1751,7 @@ Product Save
 +
 Price / Inventory
 +
-Similar Runner
+Similar Runner (Activity 비교)
 ```
 
 ---
