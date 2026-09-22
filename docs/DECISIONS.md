@@ -100,7 +100,7 @@
 
 > ⚠️ **D-09(2026-09-21)으로 대체.** SSOT는 `10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx`다.
 > 아래의 "원본 xlsx는 읽기 전용", "Migration 재작업 금지" 원칙은 그대로 유효하다.
-> `scripts/seed/`는 `PDB_v0.2` 기준이라 `10-A v1.5`에 맞춰 재작성이 필요하다.
+> `scripts/seed/`는 2026-09-22에 `10-A v1.5` 기준으로 재작성 완료했다.
 
 - `06 §02`의 원본 진단(15컬럼, 1행 다제품)과 `§22.1`의 Migration 7단계는 **이미 완료됨**. 재작업하지 않는다
 - `05 §24`가 참조하는 `러닝화_DB_ver2.0`, `06`이 참조하는 `러닝화_DB_통합본`은 현재 프로젝트에 없다
@@ -138,7 +138,8 @@ D-01~D-08은 `01 v1.4` ~ `09 v0.1` 기준으로 확정됐으나, 이후 레포�
 - **Similar Runner는 P0로 승격하되 Gear Discovery로 한정한다.**
   사람 목록·프로필·팔로우 등 Community는 그대로 P2·OUT이다. 확장 순서는 GEAR → ACTIVITY → PEOPLE.
 - **Product DB SSOT는 `10-A v1.5`.** D-08의 `06-A v0.2`는 대체된다.
-  다만 `scripts/seed/`는 `PDB_v0.2` xlsx 기준으로 작성돼 있어 **재작성이 필요하다.**
+  `scripts/seed/` 파이프라인은 2026-09-22에 `10-A v1.5` 기준으로 **재작성 완료**했다.
+  (`seed/products.v1.5.json` — 제품 35 / Eligible 10 / Evidence 80)
 - D-04~D-07은 그대로 유효하다. 특히 D-06(Caution 3단계)은 "Hard 적용 시 후보 0개"라는
   실측에서 나온 것이라 타입 체계와 무관하게 유효하다.
 

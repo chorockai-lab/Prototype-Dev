@@ -102,8 +102,9 @@ Claude Code는 작업 전 `CLAUDE.md`를 가장 먼저 확인합니다.
 | `docs/DECISIONS.md` | 기획 문서 간 충돌 해소 기록 (D-01~D-09) |
 | `docs/UX_Prototype_Fix_Plan_v1.0.md` | UX 개선 계획 |
 | `docs/superpowers/` | 프로토타입 제작 당시 plan / spec 기록 |
-| `seed/products.v0.2.json` | Product DB `PDB_v0.2` 정규화 산출물 (제품 61 · Evidence 397) |
+| `seed/products.v1.5.json` | Product DB `product_db_v1.5` 정규화 산출물 (제품 35 · Eligible 10 · Evidence 80) |
 | `scripts/seed/` | xlsx → JSON 변환 및 검증 파이프라인 (`GM-060` 선행 구현) |
+| `archive/seed/products.v0.2.json` | 구 `PDB_v0.2` 산출물 (보관본) |
 | `src/domain/shared/vocabulary.ts` | 도메인 용어 · Rule Version 상수 |
 | `archive/` | 프로토타입 v1.2 및 보관 규칙 (보관본) |
 
@@ -112,8 +113,17 @@ Claude Code는 작업 전 `CLAUDE.md`를 가장 먼저 확인합니다.
 > `archive/`의 v1.2와 루트의 v1.5 / v1.6은 보관본이며 새 구현의 기준으로 쓰지 않습니다.
 > 상세는 `docs/DECISIONS.md` D-09 참조.
 
-`scripts/seed/`는 `PDB_v0.2` xlsx를 대상으로 작성되어 있어, 현재 `10-A v1.5`에 맞춰
-갱신이 필요합니다.
+`scripts/seed/`는 2026-09-22에 `10-A v1.5` 기준으로 재작성했습니다.
+
+```bash
+npm install
+npm run seed:build    # 10-A v1.5 xlsx -> seed/products.v1.5.json
+npm run seed:verify   # 정합성 검증 게이트
+```
+
+> 워크북 XML에 `x:` 네임스페이스 접두가 붙어 있어 ExcelJS로는 읽히지 않습니다.
+> 파서를 SheetJS로 교체했고, 패치 버전을 쓰기 위해 공식 CDN 타르볼로 고정했습니다.
+> 설치 시 `cdn.sheetjs.com` 접근이 필요합니다.
 
 ---
 

@@ -31,6 +31,15 @@ Base: `prototype-v1.6`
 - `DESIGN.md`가 archive v1.2 계열임을 명시
 - 04~09 문서의 상호 참조 버전을 실제 파일 기준으로 정렬
 
+### Seed 파이프라인 재작성 (2026-09-22)
+
+- `scripts/seed/` 를 `product_db_v1.5` 기준으로 전면 재작성
+- 파서를 ExcelJS에서 SheetJS로 교체 (10-A 워크북의 `x:` 네임스페이스 접두를 ExcelJS가 못 읽음)
+- `seed/products.v1.5.json` 신규 산출 (제품 35 · Eligible 10 · Evidence 80)
+- 구 산출물 `seed/products.v0.2.json` 을 `archive/seed/` 로 이동
+- `vocabulary.ts` 를 v1.5 통제어휘로 교체 (점수 척도 1~5 → 0~100 여덟 축)
+- 검증 게이트에 Direction 후보 커버리지 실측 검사 추가
+
 ## v1.6 — UX Clarity
 
 파일: `Prototype_GearMatch_AI_1.6_UXClarity.html`

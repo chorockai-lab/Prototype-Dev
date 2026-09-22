@@ -40,6 +40,14 @@
 
 ---
 
+## archive/seed/
+
+`archive/seed/products.v0.2.json` 은 구 `PDB_v0.2` 정규화 산출물(제품 61 · Evidence 397)이다.
+D-09로 Product DB SSOT가 `10-A v1.5`로 바뀌면서 `seed/` 에서 이리로 옮겼다.
+현재 정본 산출물은 `seed/products.v1.5.json` 이다.
+
+---
+
 ## v1.2는 정본 계열이 아니다 — 판정 완료
 
 이 v1.2와 루트 계열(v1.5 → v1.6 → v1.7)은 비주얼 월드도 타입 체계도 다르다.

@@ -59,7 +59,7 @@ Gear는 폐기되지 않고 Identity · Activity · Expression 뒤에 온다.
 - `TYPE_RULE_v0.1` — **Runner Type 6종**(`ROUTINE_RUNNER` / `EXPLORE_RUNNER` / `DISTANCE_RUNNER` / `PACE_RUNNER` / `RACE_RUNNER` / `ALL_AROUND_RUNNER`). 앞 5종이 Core Persona고 `ALL_AROUND_RUNNER`는 점수가 몰릴 때 나오는 판정 결과다. 단일 질문으로 Type을 결정하지 않는다. (D-09로 5종+Modifier 체계를 대체. GM-031 착수 시 `TYPE_RULE_v0.2`로 올린다)
 - `gear_reco_v1.1` — Filter / Score / Trade-off / Caution 3단계. Caution은 제품 고정값이 아니라 사용자 Context × 제품 속성으로 런타임 결정하며, **WARN 등급은 카드 `WATCH` 영역에 필수 노출**한다(접힌 영역에 두지 않는다). (D-06)
 - `SIM_v0.1` — Similar Runner는 **P0 독립 화면(Gear Discovery)** 이면서 추천 카드 내부 Evidence이기도 하다. 사람 탐색·프로필은 P2. Similarity Score 숫자는 사용자에게 노출하지 않으며 `93% MATCH` 같은 표현도 쓰지 않는다. (D-02 → D-09로 갱신)
-- `product_db_v1.5` — Product DB SSOT는 `10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx`. `seed/products.v0.2.json`은 구 `PDB_v0.2` 산출물이며 재생성이 필요하다. (D-08 → D-09로 갱신)
+- `product_db_v1.5` — Product DB SSOT는 `10-A_GearMatch_AI_Product_Recommendation_DB_v1.5_LogicReviewed.xlsx`. 정규화 산출물은 `seed/products.v1.5.json`(제품 35 · Eligible 10 · Evidence 80)이다. 구 `PDB_v0.2` 산출물은 `archive/seed/`로 옮겼다. (D-08 → D-09로 갱신)
 - Rule을 변경하면 반드시 Version을 올린다. 과거 추천 화면을 재현할 수 없게 되는 것이 가장 큰 손실이다.
 
 **개발 원칙**
@@ -82,8 +82,8 @@ Gear는 폐기되지 않고 Identity · Activity · Expression 뒤에 온다.
 
 ## Evidence on Hand
 
-- **제품 DB** `seed/products.v0.2.json` — 제품 61개, Recommendation Eligible 29개. `cushionScore` / `stabilityScore` / `responsivenessScore` / `weightG` / `dropMm` / `plateType` / `fitWidth` / `cautionTags` 보유. **MSRP 29개 전부 존재, 공식 제품 URL 전부 존재.** Evidence 397행.
-- **제품 이미지는 없다.** `officialImageUrl`이 Eligible 29개 전부 `null`. Placeholder로 진행하고, 값이 채워지면 코드 변경 없이 교체되도록 설계한다. (Q2) **이미지를 지어내지 않는다.**
+- **제품 DB** `seed/products.v1.5.json` — 제품 35개, Recommendation Eligible 10개. 성능 점수는 0~100 여덟 축(`daily` / `comfort` / `stability` / `responsiveness` / `long_run` / `speed` / `race` / `versatility`). **Eligible 10개 전부 MSRP와 공식 제품 URL 보유.** Evidence 80행(Eligible 10 × 8축), 전부 Tier B.
+- **제품 이미지는 없다.** v1.5의 `imageSourceUrl`은 35개 전부 제품 페이지 URL과 같아 실제 이미지 주소가 아니다. Placeholder로 진행하고, 값이 채워지면 코드 변경 없이 교체되도록 설계한다. (Q2) **이미지를 지어내지 않는다.**
 - **Seed Runner Panel 미착수** (Q1). 따라서 "비슷한 러너 N명 중 M명" 표본이 실재하지 않는다. `n=0/1` Fallback이 정상 상태이며 **표본 수를 지어내지 않는다.**
 - HOKA / Brooks는 현재 추천 후보에 없다 (Q4). MVP는 "현재 등록된 제품 범위"를 정직하게 고지한다.
 - 판정 규칙 구현체: `archive/prototype-multifile/js/type-rule.js` (SSOT), 확정 카피: `archive/prototype-multifile/js/i18n.ko.js`. **⚠️ 이 두 파일은 이 레포에 없다 — 작업 PC에만 있다.** `archive/README.md`의 "이 레포에 올라오지 않은 것" 참조.

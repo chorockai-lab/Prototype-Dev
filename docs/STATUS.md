@@ -1,6 +1,6 @@
 # GearMatch AI — 프로젝트 현황
 
-**갱신일:** 2026-09-21
+**갱신일:** 2026-09-22
 **목적:** 집 PC / 회사 PC 어디서 열어도 "지금 어디까지 왔고 다음에 뭘 하면 되는지"를 이 문서 하나로 파악한다.
 
 > 이 문서는 **현황 기록**이다. 기획 결정은 `docs/DECISIONS.md`, 개발 규칙은 `CLAUDE.md`,
@@ -13,8 +13,9 @@
 **기획 문서는 완비됐고, 실제 애플리케이션 코드는 아직 0줄이다.**
 2026-09-21에 **D-09 정본 판정이 완료**돼 가장 큰 블로커는 풀렸다.
 정본은 **레포 최신 기획서 + `Prototype v1.7`**, Runner Type은 **6종**이다.
-남은 것은 GM-001 Scope Lock의 나머지 작업(레포 구조 재배치, `RULE_VERSIONS` 갱신,
-`scripts/seed/` 재작성)이다.
+`scripts/seed/` 파이프라인도 `10-A v1.5` 기준으로 재작성해 `npm run seed:build` /
+`seed:verify` 가 통과한다. 남은 것은 GM-001 Scope Lock의 레포 구조 재배치 판단과
+P0 기능 목록 단일 문서화다.
 
 ---
 
@@ -71,7 +72,7 @@ D:\Claude\.git                     ← 커밋 0개 · 리모트 없음 · branch
 | 디자인 | `DESIGN.md` (「레인 배정」 시스템 — v1.2 계열), `prototype/design/*.dc.html` |
 | 제품 정의 | `PRODUCT.md` |
 | 결정 기록 | `docs/DECISIONS.md` (D-01~D-09) |
-| 데이터 파이프라인 | `scripts/seed/` (xlsx→JSON 변환·검증), `seed/products.v0.2.json` |
+| 데이터 파이프라인 | `scripts/seed/` (xlsx→JSON 변환·검증), `seed/products.v1.5.json` |
 | 도메인 상수 | `src/domain/shared/vocabulary.ts` |
 | 개발 규칙 | `CLAUDE.md` |
 
@@ -95,7 +96,7 @@ D:\Claude\.git                     ← 커밋 0개 · 리모트 없음 · branch
 | E03 Runner Test & Identity | GM-030~033 | 미착수 — **차단 해제됨** (Runner Type 6종 확정) |
 | E04 Profile & Current Shoe | GM-040~042 | 미착수 |
 | E05 Activity & Shoe Mileage | GM-050~053 | 미착수 |
-| E06 Product DB Foundation | GM-060~063 | **부분 선행** — `scripts/seed/`가 GM-060 일부 구현 |
+| E06 Product DB Foundation | GM-060~063 | **부분 선행** — `scripts/seed/`가 `v1.5` 기준으로 GM-060 일부 구현 |
 | E07 Recommendation Engine | GM-070~079 | 미착수 |
 | E08 Recommendation Experience | GM-080~082 | 미착수 |
 | E09 Feedback & Purchase Intent | GM-090~092 | 미착수 |
@@ -136,14 +137,29 @@ D:\Claude\.git                     ← 커밋 0개 · 리모트 없음 · branch
 > 가능하지만, 지금은 **문서를 실제 구조에 맞춘 쪽**으로 정리했다.
 > 재배치를 원하면 GM-001에서 별도로 진행한다.
 
-### 🟡 데이터 파이프라인 버전 불일치
+### ✅ 해소됨 — 데이터 파이프라인 버전 불일치 (2026-09-22)
 
-**이건 아직 남아 있다.**
+`scripts/seed/`를 `product_db_v1.5` 기준으로 재작성했다. `seed/products.v1.5.json`
+(제품 35 / Eligible 10 / Evidence 80)이 산출되고 `npm run seed:verify` 가 통과한다.
+구 산출물은 `archive/seed/products.v0.2.json` 으로 옮겼다.
 
-`scripts/seed/`는 `PDB_v0.2`(제품 61 · Evidence 397) 기준으로 작성돼 있다.
-D-09가 확정한 정본은 `product_db_v1.5` = `10-A v1.5`(35개 / VERIFIED 10)다.
-`src/domain/shared/vocabulary.ts`의 `RULE_VERSIONS`는 2026-09-21에 확정 버전으로 갱신했지만,
-**`scripts/seed/` 파이프라인 재작성은 미착수**다.
+파서도 바꿨다. 10-A 워크북은 XML 요소에 `x:` 네임스페이스 접두가 붙어 있어
+ExcelJS가 `workbook.xml` 단계에서 실패한다. SheetJS로 교체했고, npm 레지스트리 최신(0.18.5)이
+미패치라 공식 CDN 타르볼(0.20.3)로 고정했다. **설치에 `cdn.sheetjs.com` 접근이 필요하다.**
+exceljs가 빠지면서 `npm audit` 경고도 0건이 됐다.
+
+### 🟡 Direction 후보 풀이 얇다
+
+`npm run seed:verify` 가 실측으로 잡아낸 새 공백이다.
+Eligible 10종으로 7개 Direction을 채우면 두 방향이 카드 3장을 못 채운다.
+
+| Direction | 허용 primary_use | Eligible 후보 |
+|---|---|---|
+| `STABILITY_SUPPORT` | `STABILITY` (Hard Filter) | **1** |
+| `RACE_FOCUS` | `RACE` | **2** |
+
+나머지 5개 Direction은 3 이상이다. 후보가 0인 Direction은 없어 렌더 자체는 가능하다.
+DRAFT 25종 중 `STABILITY` 5종 / `RACE` 5종을 검증해 올리면 해소된다.
 
 ---
 
@@ -162,7 +178,8 @@ D-09가 확정한 정본은 `product_db_v1.5` = `10-A v1.5`(35개 / VERIFIED 10)
 - [x] 문서 간 상호 참조 버전 정합 (04~09의 상위 기준 문서, 기준 Prototype)
 - [ ] 보관본(`archive/` v1.2, 루트 v1.5)의 보관 사유를 `archive/README.md`에 명시
 - [ ] 레포 구조 재배치 여부 결정 (`docs/`, `data/`, `prototype/`로 옮길지)
-- [ ] `scripts/seed/`를 `10-A v1.5` 기준으로 재작성
+- [x] `scripts/seed/`를 `10-A v1.5` 기준으로 재작성 (2026-09-22)
+- [ ] DRAFT 25종 중 `STABILITY` / `RACE` 제품을 검증해 Direction 후보 풀 확보
 - [ ] P0 기능 목록 단일 문서화 (v1.7의 Today's Run / Share Card / Insight / Runners Like You 포함)
 
 ### 2단계 — 기반 공사
